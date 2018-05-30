@@ -9,6 +9,9 @@ if [ -z $KEY_NAME ]; then
 fi
 
 # CSR           Certificate Signing Request
+# -text         Print verbose certificate request details to output file
+# -subject      Print certificate request subject line to output file
+# -pubkey       Print public key to output file (and private key...)
 openssl req \
     -new \
     -keyout $KEY_DIR/$KEY_NAME.pem \
