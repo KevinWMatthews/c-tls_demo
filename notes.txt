@@ -1,0 +1,48 @@
+
+Encrypted with      Decrypted with
+    public key      private key
+    private key     public or private key
+
+Traditional encryption:
+    Bob and Alice get each other's public keys
+
+    [random data encrypted with Alice's public key]
+    Bob      =>     Alice
+                    Decrypts random data.
+                    (Can only be decrypted with Alice's private key)
+    Bob     <=      Alice
+
+
+TLS (SSL) certificates:
+    Server:
+        Generate certificate
+
+    User:
+        Load server certificate to client
+
+    Server:
+        Hash certificate
+        Encrypt with private key
+        Append to certificate
+        Server sends this new certificate to client
+
+    Client:
+        decrypts hash using the public key from the manually loaded certificate (not in the certificate that the server sent)
+        calculates its own hash
+        compares calculated hash to decrypted hash
+
+    Client:
+        generate random number
+        encrypt with public key from manually loaded certificate
+        send to server
+
+    Server:
+        decrypt random data with its private key
+        send decrypted data to client
+
+    Client:
+        compare received data to generated data
+
+
+Terms:
+    CSR     Certificate Signing Request
