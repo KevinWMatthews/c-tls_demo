@@ -11,7 +11,6 @@ fi
 openssl req \
     -new \
     -x509 \
-    -days 1095 \
     -config config.cnf \
     -keyout $KEY_DIR/$KEY_NAME.pem \
     -out $KEY_DIR/$KEY_NAME.crt
