@@ -15,6 +15,7 @@
 #define CERTFILE    "keys/server.crt"
 #define KEYFILE     "keys/server.pem"
 #define PASSWORD    "1234"
+#define DHFILE      "keys/dh1024.pem"
 
 #define PORT        8084
 
@@ -155,6 +156,26 @@ static void destroy_ctx(SSL_CTX *ctx)
     SSL_CTX_free(ctx);
 }
 
+
+/*
+ * Set Diffie-Hellman parameters in SSL Context.
+ */
+void load_dh_params(SSL_CTX *ctx, char *file)
+{
+    DH *ret = 0;
+    BIO *bio = 0;
+
+    bio = BIO_new_file(file, "r");
+
+    if ( bio == NULL)
+        berr_exit("Couldn't open DH file");
+
+    ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+    BIO_free(bio);
+    if( SSL_CTX_set_tmp_dh(ctx,ret) < 0 )
+        berr_exit("Couldn't set DH parameters");
+}
+
 int main(void)
 {
     SSL_CTX *ctx = 0;
@@ -165,6 +186,7 @@ int main(void)
 
     /* Build our SSL context*/
     ctx = initialize_ctx(CERTFILE, KEYFILE, PASSWORD);
+    load_dh_params(ctx, DHFILE);
 
     destroy_ctx(ctx);
 
