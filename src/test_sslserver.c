@@ -200,6 +200,18 @@ int tcp_listen(void)
     return sock;
 }
 
+void child_process(int sock, SSL_CTX *ctx)
+{
+    // BIO *sbio = 0;
+    // SSL *ssl = 0;
+    // int r = 0;
+
+    pid_t pid = getpid();
+    printf("Entering child process: %d\n", pid);
+
+    printf("Exiting the child process: %d\n", pid);
+}
+
 int main(void)
 {
     SSL_CTX *ctx = 0;
@@ -214,6 +226,28 @@ int main(void)
     load_dh_params(ctx, DHFILE);
 
     sock = tcp_listen();
+
+    while (1)
+    {
+        int s;
+        pid_t pid;
+
+        s = accept(sock, 0, 0);
+        if (s < 0)
+            err_exit("Error accepting socket connection");
+
+        pid = fork();
+        if (pid)
+        {
+            // Fork returns the PID (nonzero) in the parent process
+            close(s);
+        }
+        else
+        {
+            // Fork returns 0 in the client process
+            child_process(s, ctx);
+        }
+    }
 
     destroy_ctx(ctx);
     close(sock);
