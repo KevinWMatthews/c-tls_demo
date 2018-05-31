@@ -138,16 +138,21 @@ static SSL_CTX *initialize_ctx(char *certfile, char *keyfile, char *password)
 
     /* Load the CAs we trust*/
     if( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
-    {
-        printf("%s\n", CA_LIST);
         berr_exit("Can't read CA list");
-    }
 
     #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
     SSL_CTX_set_verify_depth(ctx, 1);
     #endif
 
     return ctx;
+}
+
+/*
+ * Free all context resources
+ */
+static void destroy_ctx(SSL_CTX *ctx)
+{
+    SSL_CTX_free(ctx);
 }
 
 int main(void)
@@ -160,6 +165,8 @@ int main(void)
 
     /* Build our SSL context*/
     ctx = initialize_ctx(CERTFILE, KEYFILE, PASSWORD);
+
+    destroy_ctx(ctx);
 
     return 0;
 }
