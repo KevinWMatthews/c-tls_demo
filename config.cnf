@@ -1,4 +1,5 @@
 # See https://www.openssl.org/docs/manmaster/man1/req.html, section "CONFIGURATION FILE FORMAT"
+# See also http://apfelboymchen.net/gnu/notes/openssl%20multidomain%20with%20config%20files.html
 [ req ]
 # input_password =                                    # Password for input private key file, if present. Override with -passin
 # output_password =                                   # Password for output private key, if created. Override with passout

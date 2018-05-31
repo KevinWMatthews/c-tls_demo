@@ -51,3 +51,8 @@ TLS (SSL) certificates:
 Terms:
     X.509 Certificate       TLS/SSL Certificate
     CSR                     Certificate Signing Request
+
+
+openssl req
+    Create and/or process certificate requests
+    Reads the [ req ] section of a config file.
