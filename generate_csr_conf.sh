@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-KEY_DIR=generated
 KEY_NAME="$1"
 
 if [ -z $KEY_NAME ]; then
@@ -10,6 +9,6 @@ fi
 
 openssl req \
     -new \
-    -keyout $KEY_DIR/$KEY_NAME.pem \
-    -config config.cnf \
-    -out $KEY_DIR/$KEY_NAME.csr
+    -keyout $KEY_NAME.pem \
+    -config config/sample.cnf \
+    -out $KEY_NAME.csr

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-KEY_DIR=keys
 KEY_NAME="$1"
 
 if [ -z $KEY_NAME ]; then
@@ -12,6 +11,6 @@ openssl req \
     -new \
     -x509 \
     -days 1095 \
-    -config config.cnf \
-    -keyout $KEY_DIR/$KEY_NAME.pem \
-    -out $KEY_DIR/$KEY_NAME.crt
+    -config config/sample.cnf \
+    -keyout $KEY_NAME.pem \
+    -out $KEY_NAME.crt
