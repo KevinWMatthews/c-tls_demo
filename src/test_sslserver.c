@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <openssl/ssl.h>
+
 #define PORT        8084
 
 // Prints the IP address used for eth0
@@ -48,5 +50,8 @@ static void print_current_ip_addr(int port)
 int main(void)
 {
     print_current_ip_addr(PORT);
+
+    OpenSSL_add_all_algorithms();
+
     return 0;
 }

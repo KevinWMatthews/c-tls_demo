@@ -10,7 +10,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 CFLAGS = -Wall
-LDFLAGS =
+LDFLAGS = -lssl -lcrypto
 
 ### Helper functions. Must be listed before targets.
 c_to_o = $(patsubst %.c,%.o,$1) 		# Convert list of .c files to list of .o files
@@ -32,7 +32,7 @@ all: $(EXEC)
 # Source code is found in SRC_DIR; add prefix.
 %.o: src/%.c
 	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $(OBJ_DIR)/$@
+	$(CC) $(CFLAGS) -c $< -o $(OBJ_DIR)/$@ $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
