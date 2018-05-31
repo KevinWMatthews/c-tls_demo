@@ -11,8 +11,9 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define CA_LIST     "cacert.pem"
-#define KEYFILE     "keys/server.key"
+#define CA_LIST     "keys/ca.crt"
+#define CERTFILE    "keys/server.crt"
+#define KEYFILE     "keys/server.pem"
 #define PASSWORD    "1234"
 
 #define PORT        8084
@@ -104,7 +105,7 @@ static int password_cb(char *buf,int num, int rwflag,void *userdata)
  * Read private key file
  * Load trusted CA list
  */
-static SSL_CTX *initialize_ctx(char *keyfile, char *password)
+static SSL_CTX *initialize_ctx(char *certfile, char *keyfile, char *password)
 {
     const SSL_METHOD *meth;
     SSL_CTX *ctx;
@@ -127,7 +128,7 @@ static SSL_CTX *initialize_ctx(char *keyfile, char *password)
     ctx = SSL_CTX_new(meth);
 
     /* Load our keys and certificates*/
-    if( !SSL_CTX_use_certificate_chain_file(ctx, keyfile) )
+    if( !SSL_CTX_use_certificate_chain_file(ctx, CERTFILE) )
         berr_exit("Can't read certificate file");
 
     pass = password;
@@ -137,7 +138,10 @@ static SSL_CTX *initialize_ctx(char *keyfile, char *password)
 
     /* Load the CAs we trust*/
     if( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+    {
+        printf("%s\n", CA_LIST);
         berr_exit("Can't read CA list");
+    }
 
     #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
     SSL_CTX_set_verify_depth(ctx, 1);
@@ -155,7 +159,7 @@ int main(void)
     OpenSSL_add_all_algorithms();
 
     /* Build our SSL context*/
-    ctx = initialize_ctx(KEYFILE, PASSWORD);
+    ctx = initialize_ctx(CERTFILE, KEYFILE, PASSWORD);
 
     return 0;
 }

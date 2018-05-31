@@ -33,4 +33,4 @@ openssl req \
     -days 1095 \
     -config $CONFIG_NAME \
     -keyout $KEY_NAME.pem \
-    -out $KEY_NAME.crt
+    -out $KEY_NAME.crt -text
