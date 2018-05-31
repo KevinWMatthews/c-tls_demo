@@ -176,9 +176,34 @@ void load_dh_params(SSL_CTX *ctx, char *file)
         berr_exit("Couldn't set DH parameters");
 }
 
+int tcp_listen(void)
+{
+    int sock;
+    struct sockaddr_in sin;
+    int val = 1;
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0)
+        err_exit("Couldn't create socket");
+
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(PORT);
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+    if( bind(sock,(struct sockaddr *)&sin, sizeof(sin)) < 0 )
+        berr_exit("Couldn't bind to socket");
+
+    listen(sock, 5);    //TODO check return value!
+
+    return sock;
+}
+
 int main(void)
 {
     SSL_CTX *ctx = 0;
+    int sock;
 
     print_current_ip_addr(PORT);
 
@@ -188,7 +213,10 @@ int main(void)
     ctx = initialize_ctx(CERTFILE, KEYFILE, PASSWORD);
     load_dh_params(ctx, DHFILE);
 
+    sock = tcp_listen();
+
     destroy_ctx(ctx);
+    close(sock);
 
     return 0;
 }
