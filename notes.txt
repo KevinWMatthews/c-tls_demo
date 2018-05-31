@@ -1,3 +1,7 @@
+We could generate a Certificate Signing Request and send it off to a Certificate Authority for approval.
+For us, a self-signed certificate is sufficient.
+
+
 
 Encrypted with      Decrypted with
     public key      private key
@@ -45,4 +49,5 @@ TLS (SSL) certificates:
 
 
 Terms:
-    CSR     Certificate Signing Request
+    X.509 Certificate       TLS/SSL Certificate
+    CSR                     Certificate Signing Request
