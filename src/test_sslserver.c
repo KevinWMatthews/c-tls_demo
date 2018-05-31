@@ -6,10 +6,20 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <signal.h>
 
 #include <openssl/ssl.h>
+#include <openssl/err.h>
+
+#define CA_LIST     "cacert.pem"
+#define KEYFILE     "keys/server.key"
+#define PASSWORD    "1234"
 
 #define PORT        8084
+
+// Global error handler
+static BIO *bio_err;
+static char *pass;
 
 // Prints the IP address used for eth0
 static void print_current_ip_addr(int port)
@@ -47,11 +57,105 @@ static void print_current_ip_addr(int port)
     printf("Listening to events on server at %s:%d\n", ipaddr, port);
 }
 
+static void sigpipe_handle(int x)
+{
+    // Not sure if/when this happens
+    printf("Received sigpipe!\n");
+}
+
+/*
+ * A simple error and exit routine
+ */
+int err_exit(char *string)
+{
+    fprintf(stderr,"%s\n",string);
+    exit(0);
+}
+
+/*
+ * Print SSL errors and exit
+ */
+int berr_exit(char *string)
+{
+    BIO_printf(bio_err,"%s\n",string);
+    ERR_print_errors(bio_err);
+    exit(0);
+}
+
+/*
+ * The password code is not thread safe
+ */
+static int password_cb(char *buf,int num, int rwflag,void *userdata)
+{
+    if(num<strlen(pass)+1)
+        return(0);
+
+    strcpy(buf,pass);
+    return(strlen(pass));
+}
+
+/*
+ * Initialize SSL context
+ *
+ * Start SSL Library
+ * Start error handling
+ * Create method (?)
+ * Read certificate file
+ * Read private key file
+ * Load trusted CA list
+ */
+static SSL_CTX *initialize_ctx(char *keyfile, char *password)
+{
+    const SSL_METHOD *meth;
+    SSL_CTX *ctx;
+
+    if(!bio_err)
+    {
+        /* Global system initialization*/
+        SSL_library_init();
+        SSL_load_error_strings();
+
+        /* An error write context */
+        bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
+    }
+
+    /* Set up a SIGPIPE handler */
+    signal(SIGPIPE, sigpipe_handle);
+
+    /* Create our context*/
+    meth = SSLv23_method();
+    ctx = SSL_CTX_new(meth);
+
+    /* Load our keys and certificates*/
+    if( !SSL_CTX_use_certificate_chain_file(ctx, keyfile) )
+        berr_exit("Can't read certificate file");
+
+    pass = password;
+    SSL_CTX_set_default_passwd_cb(ctx, password_cb);
+    if( !SSL_CTX_use_PrivateKey_file(ctx, keyfile, SSL_FILETYPE_PEM) )
+        berr_exit("Can't read key file");
+
+    /* Load the CAs we trust*/
+    if( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+        berr_exit("Can't read CA list");
+
+    #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
+    SSL_CTX_set_verify_depth(ctx, 1);
+    #endif
+
+    return ctx;
+}
+
 int main(void)
 {
+    SSL_CTX *ctx = 0;
+
     print_current_ip_addr(PORT);
 
     OpenSSL_add_all_algorithms();
+
+    /* Build our SSL context*/
+    ctx = initialize_ctx(KEYFILE, PASSWORD);
 
     return 0;
 }
