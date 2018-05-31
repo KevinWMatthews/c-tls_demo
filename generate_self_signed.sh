@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KEY_DIR=generated
+KEY_DIR=keys
 KEY_NAME="$1"
 
 if [ -z $KEY_NAME ]; then
