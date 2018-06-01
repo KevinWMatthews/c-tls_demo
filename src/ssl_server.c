@@ -28,6 +28,8 @@
 #include <malloc.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <resolv.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -46,7 +48,7 @@ int OpenListener(int port)
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = INADDR_ANY;
-    if ( bind(sd, &addr, sizeof(addr)) != 0 )
+    if ( bind(sd, (struct sockaddr *)&addr, sizeof(addr)) != 0 )
     {
         perror("can't bind port");
         abort();
@@ -63,12 +65,12 @@ int OpenListener(int port)
 /*--- InitServerCTX - initialize SSL server  and create context     ---*/
 /*---------------------------------------------------------------------*/
 SSL_CTX* InitServerCTX(void)
-{   SSL_METHOD *method;
+{   const SSL_METHOD *method;
     SSL_CTX *ctx;
 
     OpenSSL_add_all_algorithms();       /* load & register all cryptos, etc. */
     SSL_load_error_strings();           /* load all error messages */
-    method = SSLv2_server_method();     /* create new server-method instance */
+    method = SSLv23_server_method();    /* create new server-method instance */
     ctx = SSL_CTX_new(method);          /* create new context from method */
     if ( ctx == NULL )
     {
@@ -178,7 +180,7 @@ int main(int count, char *strings[])
         int len = sizeof(addr);
         SSL *ssl;
 
-        int client = accept(server, &addr, &len);       /* accept connection as usual */
+        int client = accept(server, (struct sockaddr *)&addr, (socklen_t *)&len);       /* accept connection as usual */
         printf("Connection: %s:%d\n",
             inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
         ssl = SSL_new(ctx);                             /* get new SSL state with context */
