@@ -9,7 +9,7 @@ default_bits = 4096                                 # If used with -new, specify
 string_mask = utf8only                              # Permit only these characters
 distinguished_name = req_distinguished_name         # Specify config file section for Distinguished Name.
 prompt = no                                         # Read config file for Distinguished Name. Do not prompt user.
-# req_extensions = req_ext                            # Specify config file section that extends the certificate request. Override with -reqexts
+req_extensions = req_ext                            # Specify config file section that extends the certificate request. Override with -reqexts
 # x509_extensions = x509_ext                          # Specify config file section that extends x509 certificates. Override with -extensions
 
 [ req_distinguished_name ]
@@ -38,7 +38,7 @@ commonName              = "CyberData"               # CN
 # organizationName_min    = 1
 # organizationName_max    = 42
 
-#[ req_ext ]
+[ req_ext ]
 # See https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 # format:
 #   extension_name=[critical,] extensino_options
