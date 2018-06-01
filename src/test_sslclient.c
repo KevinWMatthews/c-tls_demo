@@ -11,6 +11,8 @@
 #define HOST	"localhost"
 #define PORT	8084
 
+#define BUFSIZE 1500
+
 // Global error handling struct
 static BIO *bio_err = 0;
 
@@ -174,6 +176,103 @@ void check_cert(SSL *ssl, char *host)
     printf("peer_CN = %s, host = %s\n", peer_CN, host);
 }
 
+static int http_request(SSL *ssl)
+{
+    char xmlbuf[1024] = {0};
+	char pBuf[1500] = {0};
+    char buf[BUFSIZE] = {0};
+    int request_len;
+    int len;
+    int ret;
+
+    snprintf(xmlbuf, sizeof(xmlbuf),
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+        "<CubeToggleRequest>\r\n"
+        "<CubeSelection>\r\n"
+        "<CubeList>\r\n"
+        "<MACAddress>0000005056c00008</MACAddress>\r\n"
+        "</CubeList>\r\n"
+        "</CubeSelection>\r\n"
+        "<Action>PowerOff</Action>\r\n"
+        "</CubeToggleRequest>\r\n");
+
+    snprintf(pBuf, sizeof(pBuf)-1,
+        "POST /PowerzoaServer/PowerzoaMessageServlet HTTP/1.1\r\n"
+        "User-Agent: Java/1.6.0_18\r\n"
+        "Host: 127.0.0.1\r\n"
+        "Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2\r\n"
+        "Connection: keep-alive\r\n"
+        "Content-Type: text/xml\r\n"
+        "Content-Length: %lu\r\n\r\n",
+        (long unsigned int)strlen(xmlbuf));
+
+    request_len = strlen(pBuf);
+
+    printf("sending %d bytes:\n"
+            "---------------------\n"
+            "%s\n"
+            "---------------------\n",
+            request_len,
+            pBuf);
+
+    ret = SSL_write(ssl, pBuf, request_len);
+    switch(SSL_get_error(ssl, ret))
+    {
+        case SSL_ERROR_NONE:
+            if(request_len != ret)
+                err_exit("Incomplete write!");
+            break;
+        default:
+            berr_exit("SSL write problem");
+    }
+
+    memset(buf, 0, BUFSIZE);
+
+    /* Now read the server's response, assuming
+       that it's terminated by a close */
+    while (1)
+    {
+        ret = SSL_read(ssl, buf, BUFSIZE);
+        switch(SSL_get_error(ssl, ret))
+        {
+        case SSL_ERROR_NONE:
+            len = ret;
+            break;
+        case SSL_ERROR_ZERO_RETURN:
+            goto shutdown;
+        case SSL_ERROR_SYSCALL:
+            fprintf(stderr, "SSL Error: Premature close\n");
+            goto done;
+        default:
+            berr_exit("SSL read problem");
+        }
+
+        printf("Received %d bytes:\n"
+        "---------------------\n"
+        "%s\n"
+        "\n---------------------\n",
+        len,
+        buf);
+    }
+
+shutdown:
+    ret = SSL_shutdown(ssl);
+    switch(ret)
+    {
+    case 1:
+        break; /* Success */
+    case 0:
+    case -1:
+    default:
+        // Does this leak? Do we need to call SSL_free()?
+        berr_exit("Shutdown failed");
+    }
+
+done:
+    SSL_free(ssl);
+    return 0;
+}
+
 int main(void)
 {
     SSL_CTX *ctx = 0;
@@ -198,6 +297,8 @@ int main(void)
 
     // if (require_server_auth)
     check_cert(ssl, host);      // Validate the host with the CA
+
+    http_request(ssl);
 
     destroy_ctx(ctx);
 
