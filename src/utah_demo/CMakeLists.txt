@@ -1,0 +1,16 @@
+add_executable(server_utah
+    ssl_server.c
+)
+target_link_libraries(server_utah
+    PRIVATE
+        ssl
+        crypto
+)
+add_executable(client_utah
+    ssl_client.c
+)
+target_link_libraries(client_utah
+    PRIVATE
+        ssl
+        crypto
+)

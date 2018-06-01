@@ -1,0 +1,16 @@
+add_executable(server_na
+    test_sslserver.c
+)
+target_link_libraries(server_na
+    PRIVATE
+        ssl
+        crypto
+)
+add_executable(client_na
+    test_sslclient.c
+)
+target_link_libraries(client_na
+    PRIVATE
+        ssl
+        crypto
+)
