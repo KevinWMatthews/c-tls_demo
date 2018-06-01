@@ -1,5 +1,5 @@
 ### List all executables here
-EXEC = test_sslserver test_sslclient ssl_client
+EXEC = test_sslserver test_sslclient ssl_server ssl_client
 
 ### List source and object files for all executables here
 test_sslserver_SRC = test_sslserver.c
@@ -7,6 +7,9 @@ test_sslserver_OBJ = $(call c_to_o,$(test_sslserver_SRC))
 
 test_sslclient_SRC = test_sslclient.c
 test_sslclient_OBJ = $(call c_to_o,$(test_sslclient_SRC))
+
+ssl_server_SRC = ssl_server.c
+ssl_server_OBJ = $(call c_to_o,$(ssl_server_SRC))
 
 ssl_client_SRC = ssl_client.c
 ssl_client_OBJ = $(call c_to_o,$(ssl_client_SRC))
@@ -30,6 +33,10 @@ test_sslserver: $(test_sslserver_OBJ)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/$^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 
 test_sslclient: $(test_sslclient_OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(OBJ_DIR)/$^ -o $(BIN_DIR)/$@ $(LDFLAGS)
+
+ssl_server: $(ssl_server_OBJ)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/$^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 
