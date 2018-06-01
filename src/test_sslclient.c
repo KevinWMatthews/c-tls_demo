@@ -69,18 +69,24 @@ int tcp_connect(char *host, int port)
     struct hostent *hp;
     struct sockaddr_in addr;
     int sock;
+    int ret;
 
-    if(!(hp=gethostbyname(host)))
+    hp = gethostbyname(host);
+    if(!hp)
         berr_exit("Couldn't resolve host");
-    memset(&addr,0,sizeof(addr));
-    addr.sin_addr=*(struct in_addr*) hp->h_addr_list[0];
-    addr.sin_family=AF_INET;
-    addr.sin_port=htons(port);
 
-    if((sock=socket(AF_INET,SOCK_STREAM, IPPROTO_TCP))<0)
-        return -1;
-    if(connect(sock,(struct sockaddr *)&addr, sizeof(addr))<0)
-        return -1;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_addr = *(struct in_addr*)hp->h_addr_list[0];
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+
+    sock = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP);
+    if (sock < 0)
+        berr_exit("Could not create socket");
+
+    ret = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+    if (ret < 0)
+        berr_exit("Could not connect to socket");
 
     return sock;
 
