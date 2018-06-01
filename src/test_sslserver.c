@@ -19,6 +19,9 @@
 
 #define PORT        8084
 
+// http buffer
+#define BUFSIZE     1500
+
 // Global error handler
 static BIO *bio_err;
 static char *pass;
@@ -200,6 +203,84 @@ int tcp_listen(void)
     return sock;
 }
 
+static int http_serve(SSL *ssl)
+{
+    char buf[BUFSIZE] = {0};
+	char outbuf[1500] = {0};
+    BIO *io, *ssl_bio;
+    int n;
+    int len;
+
+    io = BIO_new(BIO_f_buffer());
+    ssl_bio = BIO_new(BIO_f_ssl());
+    BIO_set_ssl(ssl_bio, ssl, BIO_CLOSE);
+    BIO_push(io, ssl_bio);
+
+    len = 1;
+
+    while (1)
+    {
+        while (len > 0)
+        {
+            memset( buf, 0, BUFSIZE );
+            len = SSL_read(ssl, buf, BUFSIZE-1);
+
+            switch(SSL_get_error(ssl, len))
+            {
+            case SSL_ERROR_NONE:
+                break;
+            case SSL_ERROR_ZERO_RETURN:
+                fprintf(stderr, "SSL Read Zero bytes\n");
+                break;
+            case SSL_ERROR_SYSCALL:
+                fprintf(stderr, "SSL Error: Premature close\n");
+                return 0;
+            default:
+                berr_exit("SSL read problem");
+            }
+
+            printf("Received %d bytes:\n"
+            "---------------------\n"
+            "%s\n"
+            "---------------------\n",
+            len,
+            buf);
+
+            memset( outbuf, 0, sizeof(outbuf) );
+
+            /* This is the register response from the spec */
+            snprintf(outbuf, sizeof(outbuf),
+            "HTTP/1.1 200 OK\r\n"
+            "Server: Apache-Coyote/1.1\r\n"
+            "Content-Length: 0\r\n"
+            "Date: Thu, 30 Jul 2009 20:00:36 GMT\r\n\r\n");
+
+            printf("sending %zu bytes:\n"
+                "---------------------\n"
+                "%s\n"
+                "---------------------\n",
+                strlen(outbuf),
+                outbuf);
+
+            n = SSL_write(ssl, outbuf, strlen(outbuf));
+            switch(SSL_get_error(ssl, n))
+            {
+                case SSL_ERROR_NONE:
+                    if(strlen(outbuf) != n)
+                        err_exit("Incomplete write!");
+                    break;
+                default:
+                    berr_exit("SSL write problem");
+            }
+        }
+
+		// len was <= 0, which means our friend doesn't want to talk to us any more
+		// Close down the connection and start over
+		printf("client has closed the connection\n");
+    }
+    return 0;
+}
+
 void child_process(int sock, SSL_CTX *ctx)
 {
     BIO *sbio = 0;
@@ -221,6 +302,9 @@ void child_process(int sock, SSL_CTX *ctx)
         berr_exit("SSL accept error");
 
     printf("[%s,%s]\n", SSL_get_version(ssl), SSL_get_cipher(ssl));
+
+    printf("Child process %d is serving http\n", pid);
+    http_serve(ssl);
 
     printf("Exiting the child process: %d\n", pid);
     close(sock);
