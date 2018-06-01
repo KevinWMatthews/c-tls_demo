@@ -8,13 +8,13 @@ usage ()
     echo "Read a Certificate"
     echo ""
     echo "Options:"
-    echo "  --print-pem     Print the contents of the public key"
+    echo "  --print-key     Print the contents of the public key"
     echo "  --print-crt     Print the contents of the certificate"
     echo ""
 }
 
-CERT_NAME=
-PRINT_PEM="-noout"      # Prints by default; must silence
+CERT=
+PRINT_KEY="-noout"      # Prints by default; silence unless overridden by user
 PRINT_CRT=""            # Silent by default
 
 
@@ -28,8 +28,8 @@ POSITIONAL_ARGS=()
 while [ $# -gt 0 ]; do
     arg="$1"
     case $arg in
-        --print-pem)
-            PRINT_PEM=""
+        --print-key)
+            PRINT_KEY=""
             shift
             ;;
         --print-crt)
@@ -54,8 +54,18 @@ if [ "${#POSITIONAL_ARGS[@]}" -gt 1 ]; then
     exit 1
 fi
 
-CERT_NAME=${POSITIONAL_ARGS[0]}
+CERT=${POSITIONAL_ARGS[0]}
+if [ -z $CERT ]; then
+    echo "$(basename $0): CERT may not be empty"
+    exit 1
+fi
 
-# -noout    do not print public key
-# -text     print certificate contents
-openssl x509 -in $CERT_NAME $PRINT_PEM $PRINT_CRT
+openssl x509 \
+    $PRINT_KEY \
+    $PRINT_CRT \
+    -in $CERT
+
+# The x509 command is silent on success.
+if [ $? -eq 0 ]; then
+    echo "Verify OK"
+fi
