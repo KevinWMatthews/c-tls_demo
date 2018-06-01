@@ -45,12 +45,15 @@
 int OpenListener(int port)
 {   int sd;
     struct sockaddr_in addr;
+    int val = 1;
 
     sd = socket(PF_INET, SOCK_STREAM, 0);
     bzero(&addr, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = INADDR_ANY;
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
     if ( bind(sd, (struct sockaddr *)&addr, sizeof(addr)) != 0 )
     {
         perror("can't bind port");
