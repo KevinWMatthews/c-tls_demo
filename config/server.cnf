@@ -39,6 +39,7 @@ commonName              = "localhost"               # CN
 # organizationName_max    = 42
 
 [ ca ]
+# See https://www.openssl.org/docs/manmaster/man1/ca.html
 
 default_ca = CA_default
 
