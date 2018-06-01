@@ -11,11 +11,11 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define CA_LIST     "keys/ca.crt"
-#define CERTFILE    "keys/server.crt"
-#define KEYFILE     "keys/server.pem"
+#define CA_LIST     "../keys/ca.crt"
+#define CERTFILE    "../keys/server.crt"
+#define KEYFILE     "../keys/server.pem"
 #define PASSWORD    "1234"
-#define DHFILE      "keys/dh1024.pem"
+#define DHFILE      "../keys/dh1024.pem"
 
 #define PORT        8084
 

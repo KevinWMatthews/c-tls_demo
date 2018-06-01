@@ -36,8 +36,8 @@
 
 #define FAIL    -1
 
-#define CA_CERT "keys/ca.crt"
-#define CA_KEY  "keys/ca.pem"
+#define CA_CERT "../keys/ca.crt"
+#define CA_KEY  "../keys/ca.pem"
 
 /*---------------------------------------------------------------------*/
 /*--- OpenListener - create server socket                           ---*/

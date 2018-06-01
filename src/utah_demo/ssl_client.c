@@ -35,7 +35,7 @@
 
 #define FAIL    -1
 
-#define CA_LIST "keys/ca.crt"
+#define CA_LIST "../keys/ca.crt"
 
 /*---------------------------------------------------------------------*/
 /*--- OpenConnection - create socket and connect to server.         ---*/

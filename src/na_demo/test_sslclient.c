@@ -6,7 +6,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define CA_LIST     "keys/ca.crt"
+#define CA_LIST     "../keys/ca.crt"
 
 #define HOST	"localhost"
 #define PORT	8084
