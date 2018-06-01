@@ -13,12 +13,12 @@ usage ()
     echo ""
 }
 
-CERT_NAME="$1"
+CERT_NAME=
 PRINT_PEM="-noout"      # Prints by default; must silence
 PRINT_CRT=""            # Silent by default
 
 
-if [ -z $CERT_NAME ]; then
+if [ $# -eq 0 ]; then
     echo "$(basename $0): Must specify certificate name"
     usage
     exit 1
@@ -42,11 +42,19 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         *)
-            POSITIONAL_ARGS+=("$1")
+            POSITIONAL_ARGS+=($arg)
             shift
             ;;
     esac
 done
+
+if [ "${#POSITIONAL_ARGS[@]}" -gt 1 ]; then
+    echo "$(basename $0): Too many arguments: ${POSITIONAL_ARGS[@]}"
+    usage
+    exit 1
+fi
+
+CERT_NAME=${POSITIONAL_ARGS[0]}
 
 # -noout    do not print public key
 # -text     print certificate contents
