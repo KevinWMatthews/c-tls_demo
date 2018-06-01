@@ -207,7 +207,7 @@ void child_process(int sock, SSL_CTX *ctx)
     int r = 0;
 
     pid_t pid = getpid();
-    printf("Entering child process: %d\n", pid);
+    printf("\nEntering child process: %d\n", pid);
 
     sbio = BIO_new_socket(sock, BIO_NOCLOSE);
     ssl = SSL_new(ctx);

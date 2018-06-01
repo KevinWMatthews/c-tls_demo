@@ -23,8 +23,17 @@ static int port = PORT;
  */
 static int berr_exit(char *string)
 {
-    BIO_printf(bio_err,"%s\n",string);
+    BIO_printf(bio_err, "%s\n", string);
     ERR_print_errors(bio_err);
+    exit(0);
+}
+
+/*
+ * A simple error and exit routine
+ */
+int err_exit(char *string)
+{
+    fprintf(stderr, "%s\n", string);
     exit(0);
 }
 
@@ -73,7 +82,7 @@ int tcp_connect(char *host, int port)
 
     hp = gethostbyname(host);
     if(!hp)
-        berr_exit("Couldn't resolve host");
+        err_exit("Couldn't resolve host");
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_addr = *(struct in_addr*)hp->h_addr_list[0];
@@ -82,11 +91,11 @@ int tcp_connect(char *host, int port)
 
     sock = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP);
     if (sock < 0)
-        berr_exit("Could not create socket");
+        err_exit("Could not create socket");
 
     ret = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
     if (ret < 0)
-        berr_exit("Could not connect to socket");
+        err_exit("Could not connect to socket");
 
     return sock;
 
@@ -140,6 +149,30 @@ int tcp_connect(char *host, int port)
 #endif
 }
 
+/*
+ * Check that the common name matches the host name
+ */
+void check_cert(SSL *ssl, char *host)
+{
+    X509 *peer;
+    char peer_CN[256] = {0};
+
+    if ( SSL_get_verify_result(ssl) != X509_V_OK )
+        berr_exit("Certificate doesn't verify");
+
+    /* Check the cert chain.
+     * The chain length is automatically checked by OpenSSL when we set the verify depth in the ctx */
+
+    /* Check the common name */
+    peer = SSL_get_peer_certificate(ssl);
+    X509_NAME_get_text_by_NID(X509_get_subject_name(peer), NID_commonName, peer_CN, 256);
+    if ( strcasecmp(peer_CN, host) )
+    {
+        printf("peer_CN = %s, host = %s\n", peer_CN, host);
+        err_exit("Common name doesn't match host name");
+    }
+    printf("peer_CN = %s, host = %s\n", peer_CN, host);
+}
 
 int main(void)
 {
@@ -153,7 +186,7 @@ int main(void)
 
     sock = tcp_connect(host, port);     // Connect to the server
     if (sock < 0)
-        berr_exit("Failed to connect to socket");
+        err_exit("Failed to connect to socket");
 
     // Give the socket and context to the ssl engine and let it make the connection.
     ssl = SSL_new(ctx);
@@ -162,6 +195,9 @@ int main(void)
 
     if(SSL_connect(ssl) <= 0)
         berr_exit("SSL connect error");
+
+    // if (require_server_auth)
+    check_cert(ssl, host);      // Validate the host with the CA
 
     destroy_ctx(ctx);
 
