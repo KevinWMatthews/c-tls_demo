@@ -5,7 +5,7 @@ usage ()
     echo ""
     echo "Verify Certificate Signing Request"
     echo ""
-    echo "$(basename $0) [OPTION] [CSR]"
+    echo "$(basename $0) [OPTION] ... [CSR]"
     echo ""
     echo "Options:"
     echo "  --print-csr     Print the contens of the CSR"
@@ -29,10 +29,14 @@ while [ $# -gt 0 ]; do
             PRINT_CSR=""
             shift
             ;;
+        --help)
+            usage
+            exit 0
+            ;;
         -*)
             echo "$(basename $0): Unrecognized option: $arg"
             usage
-            exit 0
+            exit 1
             ;;
         *)
             POSITIONAL_ARGS+=($arg)

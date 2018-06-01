@@ -5,7 +5,7 @@ usage ()
     echo ""
     echo "Verify a private key"
     echo ""
-    echo "$(basename $0) [OPTION] [KEY]"
+    echo "$(basename $0) [OPTION] ... [KEY]"
     echo ""
     echo "Options:"
     echo "  --print-key     Print the contents of the private key"
@@ -29,10 +29,14 @@ while [ $# -gt 0 ]; do
             PRINT_KEY=""
             shift
             ;;
+        --help)
+            usage
+            exit 0
+            ;;
         -*)
             echo "$(basename $0): Unrecognized option: $arg"
             usage
-            exit 0
+            exit 1
             ;;
         *)
             POSITIONAL_ARGS+=($arg)

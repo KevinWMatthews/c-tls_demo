@@ -3,7 +3,7 @@
 usage ()
 {
     echo ""
-    echo "Usage: $(basename $0) [OPTION] ... CERT"
+    echo "Usage: $(basename $0) [OPTION] ... [CERT]"
     echo ""
     echo "Read a Certificate"
     echo ""
@@ -36,10 +36,14 @@ while [ $# -gt 0 ]; do
             PRINT_CRT="-text"
             shift
             ;;
+        --help)
+            usage
+            exit 0
+            ;;
         -*)
             echo "$(basename $0): Unrecognized option: $arg"
             usage
-            exit 0
+            exit 1
             ;;
         *)
             POSITIONAL_ARGS+=($arg)
