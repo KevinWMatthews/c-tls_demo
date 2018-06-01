@@ -35,6 +35,8 @@
 
 #define FAIL    -1
 
+#define CA_LIST "keys/ca.crt"
+
 /*---------------------------------------------------------------------*/
 /*--- OpenConnection - create socket and connect to server.         ---*/
 /*---------------------------------------------------------------------*/
@@ -78,6 +80,13 @@ SSL_CTX* InitCTX(void)
         ERR_print_errors_fp(stderr);
         abort();
     }
+
+    if ( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+    {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+
     return ctx;
 }
 
