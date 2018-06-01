@@ -1,14 +1,21 @@
 ### List all executables here
-EXEC = test_sslserver
+EXEC = test_sslserver test_sslclient
 
 ### List source and object files for all executables here
 test_sslserver_SRC = test_sslserver.c
 test_sslserver_OBJ = $(call c_to_o,$(test_sslserver_SRC))
 
+test_sslclient_SRC = test_sslclient.c
+test_sslclient_OBJ = $(call c_to_o,$(test_sslclient_SRC))
+
+
+### Directory structure
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
+
+### Compiler and linker flags (currently global)
 CFLAGS = -Wall
 LDFLAGS = -lssl -lcrypto
 
@@ -20,6 +27,9 @@ test_sslserver: $(test_sslserver_OBJ)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/$^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 
+test_sslclient: $(test_sslclient_OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(OBJ_DIR)/$^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 
 
 ### Rules below should not need to be changed
