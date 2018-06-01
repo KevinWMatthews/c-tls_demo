@@ -49,6 +49,20 @@ static int tcp_listen(unsigned int port)
     return socket_fd;
 }
 
+void client_handler(int socket_fd)
+{
+    pid_t pid;
+
+    pid = getpid();
+    printf("Entering client handler %d\n", pid);
+    printf("Exiting client handler %d\n", pid);
+    if ( close(socket_fd) < 0 )
+    {
+        perror("Client handler failed to close socket");
+    }
+    _exit(EXIT_SUCCESS);
+}
+
 int main(void)
 {
     int listen_socket = SOCKETFD_INVALID;
@@ -60,7 +74,49 @@ int main(void)
         return -1;
     }
 
-    close(listen_socket);
+    while (1)
+    {
+        int socket_fd = SOCKETFD_INVALID;
+        pid_t pid;
+
+        printf("\nWaiting for a socket connection...\n");
+        socket_fd = accept(listen_socket, 0, 0);
+        if (socket_fd < 0)
+        {
+            perror("Failed to accept connection");
+            continue;       // Hope for the best?
+        }
+
+        pid = fork();
+        if (pid < 0)
+        {
+            perror("Failed to fork client handler");
+            close(socket_fd);
+            close(listen_socket);
+            exit(EXIT_FAILURE);
+        }
+        else if (pid == 0)
+        {
+            // Child process
+            client_handler(socket_fd);
+        }
+        else
+        {
+            // Parent process
+            printf("Spawning client handler %d\n", pid);
+            if ( close(socket_fd) < 0 )     // Close the socket in the parent process. It should still be open in the child process?
+            {
+                perror("Server app failed to close socket");
+            }
+        }
+    }
+
+    printf("Exiting server app\n");
+    if ( close(listen_socket) < 0 )
+    {
+        perror("Server app failed to close socket on exit");
+        return -1;
+    }
 
     return 0;
 }
