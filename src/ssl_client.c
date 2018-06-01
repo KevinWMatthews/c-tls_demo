@@ -53,7 +53,7 @@ int OpenConnection(const char *hostname, int port)
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = *(long*)(host->h_addr);
-    if ( connect(sd, &addr, sizeof(addr)) != 0 )
+    if ( connect(sd, (struct sockaddr *)&addr, sizeof(addr)) != 0 )
     {
         close(sd);
         perror(hostname);
@@ -66,12 +66,12 @@ int OpenConnection(const char *hostname, int port)
 /*--- InitCTX - initialize the SSL engine.                          ---*/
 /*---------------------------------------------------------------------*/
 SSL_CTX* InitCTX(void)
-{   SSL_METHOD *method;
+{   const SSL_METHOD *method;
     SSL_CTX *ctx;
 
     OpenSSL_add_all_algorithms();       /* Load cryptos, et.al. */
     SSL_load_error_strings();           /* Bring in and register error messages */
-    method = SSLv2_client_method();     /* Create new client-method instance */
+    method = SSLv23_client_method();    /* Create new client-method instance */
     ctx = SSL_CTX_new(method);          /* Create new context */
     if ( ctx == NULL )
     {
