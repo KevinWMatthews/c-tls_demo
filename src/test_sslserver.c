@@ -202,12 +202,25 @@ int tcp_listen(void)
 
 void child_process(int sock, SSL_CTX *ctx)
 {
-    // BIO *sbio = 0;
-    // SSL *ssl = 0;
-    // int r = 0;
+    BIO *sbio = 0;
+    SSL *ssl = 0;
+    int r = 0;
 
     pid_t pid = getpid();
     printf("Entering child process: %d\n", pid);
+
+    sbio = BIO_new_socket(sock, BIO_NOCLOSE);
+    ssl = SSL_new(ctx);
+
+    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+
+    SSL_set_bio(ssl, sbio, sbio);
+
+    r = SSL_accept(ssl);
+    if (r <= 0)
+        berr_exit("SSL accept error");
+
+    printf("[%s,%s]\n", SSL_get_version(ssl), SSL_get_cipher(ssl));
 
     printf("Exiting the child process: %d\n", pid);
     close(sock);

@@ -144,6 +144,8 @@ int tcp_connect(char *host, int port)
 int main(void)
 {
     SSL_CTX *ctx = 0;
+    SSL *ssl;
+    BIO *sbio;
     int sock;
 
     OpenSSL_add_all_algorithms();
@@ -152,6 +154,14 @@ int main(void)
     sock = tcp_connect(host, port);     // Connect to the server
     if (sock < 0)
         berr_exit("Failed to connect to socket");
+
+    // Give the socket and context to the ssl engine and let it make the connection.
+    ssl = SSL_new(ctx);
+    sbio = BIO_new_socket(sock, BIO_NOCLOSE);
+    SSL_set_bio(ssl, sbio, sbio);
+
+    if(SSL_connect(ssl) <= 0)
+        berr_exit("SSL connect error");
 
     destroy_ctx(ctx);
 
