@@ -210,6 +210,11 @@ void child_process(int sock, SSL_CTX *ctx)
     printf("Entering child process: %d\n", pid);
 
     printf("Exiting the child process: %d\n", pid);
+    close(sock);
+
+    // Exit without calling userspace cleanup functions (registered with atexit() [or on_exit()])
+    // or flushing buffers and cleaning temp files multiple times
+    _exit(0);
 }
 
 int main(void)
