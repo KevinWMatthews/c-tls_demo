@@ -36,6 +36,9 @@
 
 #define FAIL    -1
 
+#define CA_CERT "keys/ca.crt"
+#define CA_KEY  "keys/ca.pem"
+
 /*---------------------------------------------------------------------*/
 /*--- OpenListener - create server socket                           ---*/
 /*---------------------------------------------------------------------*/
@@ -173,7 +176,7 @@ int main(int count, char *strings[])
     }
     portnum = strings[1];
     ctx = InitServerCTX();                              /* initialize SSL */
-    LoadCertificates(ctx, "newreq.pem", "newreq.pem");  /* load certs */
+    LoadCertificates(ctx, CA_CERT, CA_KEY);             /* load certs */
     server = OpenListener(atoi(portnum));               /* create server socket */
     while (1)
     {   struct sockaddr_in addr;
