@@ -50,6 +50,10 @@ fi
 set -- "${POSITIONAL_ARGS[@]}"
 
 CSR="$1"
+if [ -z $CSR ]; then
+    echo "$(basename $0): CSR may not be empty"
+    exit 1
+fi
 
 openssl req \
     -verify \

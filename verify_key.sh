@@ -50,6 +50,10 @@ fi
 set -- "${POSITIONAL_ARGS[@]}"
 
 KEY="$1"
+if [ -z $KEY ]; then
+    echo "$(basename $0): KEY may not be empty"
+    exit 1
+fi
 
 openssl rsa \
     -check \
