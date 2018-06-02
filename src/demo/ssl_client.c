@@ -1,3 +1,7 @@
+// https://www.openssl.org/docs/man1.0.2/ssl/ssl.html
+// The link for SSL's BIO (Basic IO) is broken. Use this instead:
+// https://www.openssl.org/docs/man1.0.2/crypto/bio.html
+
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,6 +111,11 @@ SSL_CTX *initialize_ssl_context(void)
     method = SSLv23_method();
     // Can this fail?
 
+    /*
+     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *method);
+     *
+     * Returns pointer to SSL_CTX struct on success, NULL on failure.
+     */
     ctx = SSL_CTX_new(method);
     if (ctx == NULL)
     {
