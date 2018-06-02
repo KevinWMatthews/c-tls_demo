@@ -177,7 +177,30 @@ static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
      */
     SSL_set_bio(ssl, socket_bio, socket_bio);
 
-    return 0;
+    return ssl;
+}
+
+int ssl_connect(SSL *ssl)
+{
+    int ret;
+
+    /*
+     * int SSL_connect(SSL *ssl);
+     *
+     * SSL_connect() initiates the TLS/SSL handshake with a server.
+     * The communication channel must already have been set and assigned to the ssl by setting an underlying BIO.
+     *
+     * Return values:
+     *      1 on success
+     *      0 if not successful but according to spec
+     *      < 0 on error
+     */
+    ret = SSL_connect(ssl);
+    if ( ret <= 0 )
+    {
+        fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
+    }
+    return ret;
 }
 
 int main(void)
@@ -202,6 +225,9 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
+    ssl_connect(ssl);
+
+    fprintf(stderr, "Shutting down client\n");
     if ( close(socket_fd) < 0 )
     {
         perror("Failed to close socket");
