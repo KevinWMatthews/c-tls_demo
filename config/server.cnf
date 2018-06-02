@@ -18,6 +18,8 @@ countryName             = "US"                      # C
 stateOrProvinceName     = "California"              # ST
 localityName            = "Monterey"                # L
 organizationName        = "CyberData Corporation"   # O
+#TODO change this to 'Server' or something to distinguish it from my device
+# This will prevent database conflicts
 # organizationalUnitName  =                           # ON
 commonName              = "localhost"               # CN
 # emailAddress =
