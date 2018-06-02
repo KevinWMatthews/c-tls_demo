@@ -124,6 +124,18 @@ SSL_CTX *initialize_ssl_context(void)
         fprintf(stderr, "Failed to initialize SSL context\n");
     }
 
+    /*
+     * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
+     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
+     *
+     * Callback can be null.
+     *
+     * Valid modes for a client are:
+     *      SSL_VERIFY_NONE     Continue if server does not provide cert
+     *      SSL_VERIFY_PEER     Fail if server does not provide cert
+     */
+    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+
     return ctx;
 }
 
@@ -279,7 +291,12 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    ssl_connect(ssl);
+    if ( ssl_connect(ssl) < 0 )
+    {
+        close(socket_fd);
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     check_server_cert(ssl, HOST);
 
