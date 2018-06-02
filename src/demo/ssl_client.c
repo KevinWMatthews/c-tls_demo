@@ -15,7 +15,7 @@
 static struct addrinfo *resolve_hostname(const char *host, const char *port)
 {
     struct addrinfo hints = {0};    // Criteria
-    struct addrinfo *result = 0;
+    struct addrinfo *result = NULL;
     int ret;
 
     hints.ai_family = AF_UNSPEC;        // IPv4 or IPv6 (or Unix?)
@@ -45,7 +45,7 @@ static struct addrinfo *resolve_hostname(const char *host, const char *port)
  */
 static int connect_to_socket(struct addrinfo *addr_list)
 {
-    struct addrinfo *addr = 0;
+    struct addrinfo *addr = NULL;
     int socket_fd = SOCKETFD_INVALID;
     int ret;
 
@@ -80,7 +80,7 @@ static int connect_to_socket(struct addrinfo *addr_list)
  */
 int tcp_connect(const char *host, const char *port)
 {
-    struct addrinfo *addr_list = 0;
+    struct addrinfo *addr_list = NULL;
     int socket_fd = SOCKETFD_INVALID;
     int ret;
 

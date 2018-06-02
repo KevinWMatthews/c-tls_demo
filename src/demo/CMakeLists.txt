@@ -1,6 +1,11 @@
 add_executable(ssl_server
     ssl_server.c
 )
+target_link_libraries(ssl_server
+    PRIVATE
+        ssl
+        crypto
+)
 add_executable(ssl_client
     ssl_client.c
 )

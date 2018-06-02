@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <openssl/ssl.h>
+
 #define SOCKETFD_INVALID        -1
 
 static int tcp_listen(unsigned int port)
@@ -101,9 +103,55 @@ static void handle_incoming_connections(int listen_socket)
     }
 }
 
+/*
+ * Initialize SSL library
+ * Set TLS method
+ * Load certificates
+ *
+ * Returns SSL context on success, NULL on failure.
+ * The caller is responsible for freeing the SSL context using SSL_CTX_free().
+ */
+SSL_CTX *initialize_ssl_context(void)
+{
+    const SSL_METHOD *method = NULL;
+    SSL_CTX *ctx;
+
+    SSL_library_init();
+    // SSL_Load_error_string();
+
+    method = SSLv23_method();       // Can limit to server_method() or _client_method()
+    // Can this fail?
+
+    // Can limit available methos using SSL_CTX_set_options()
+    ctx = SSL_CTX_new(method);
+    if (!ctx)
+    {
+        fprintf(stderr, "Failed to initialize SSL context\n");
+    }
+
+    // ? #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
+    SSL_CTX_set_verify_depth(ctx, 1);
+
+    return ctx;
+}
+
+/*
+ * Free all SSL context resources
+ */
+static void destroy_ssl_context(SSL_CTX *ctx)
+{
+    SSL_CTX_free(ctx);
+}
+
+
 int main(void)
 {
+    SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
+
+    ctx = initialize_ssl_context();
+    if (ctx == NULL)
+        exit(EXIT_FAILURE);
 
     listen_socket = tcp_listen(8484);
     if (listen_socket < 0)
@@ -123,6 +171,8 @@ int main(void)
         perror("Server app failed to close socket on exit");
         return -1;
     }
+
+    destroy_ssl_context(ctx);
 
     return 0;
 }
