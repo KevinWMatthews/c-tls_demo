@@ -227,6 +227,68 @@ static void destroy_ssl_context(SSL_CTX *ctx)
     SSL_CTX_free(ctx);
 }
 
+//TODO pass in the certificates and ca
+// Returns 0 on success, -1 on failure.
+#define SERVER_CERT     "../keys/server.crt"
+#define SERVER_KEY      "../keys/server.pem"
+#define CA_LIST         "../keys/ca.crt"
+static int load_server_certificates(SSL_CTX *ctx)
+{
+    /*
+     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file);
+     *
+     * SSL_CTX_use_certificate_chain_file() loads a certificate chain from file into ctx.
+     * The certificates must be in PEM format and must be sorted starting with the subject's certificate
+     * (actual client or server certificate), followed by intermediate CA certificates if applicable,
+     * and ending at the highest level (root) CA
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_certificate_chain_file(ctx, SERVER_CERT) != 1 )
+    {
+        fprintf(stderr, "Error loading server certificate chain\n");
+        return -1;
+    }
+
+
+    // Should enter passphrase
+    // SSL_CTX_set_default_passwd_cb()
+    // or
+    // SSL_CTX_set_default_passwd_cb()
+    /*
+     * int SSL_CTX_use_PrivateKey_file(SSL_CTX *ctx, const char *file, int type);
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_PrivateKey_file(ctx, SERVER_KEY, SSL_FILETYPE_PEM) != 1 )
+    {
+        fprintf(stderr, "Error loading server private key\n");
+        return -1;
+    }
+
+    /*
+     * int SSL_CTX_check_private_key(const SSL_CTX *ctx);
+     */
+    if ( SSL_CTX_check_private_key(ctx) != 1 )
+    {
+        fprintf(stderr, "Failed to check private key\n");
+        return -1;
+    }
+
+    /*
+     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
+     *
+     * Returns 1 on success, 0 on failure.
+     */
+    if ( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+    {
+        fprintf(stderr, "Failed to load CA cert\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 int main(void)
 {
     SSL_CTX *ctx = NULL;
@@ -234,6 +296,9 @@ int main(void)
 
     ctx = initialize_ssl_context();
     if (ctx == NULL)
+        exit(EXIT_FAILURE);
+
+    if ( load_server_certificates(ctx) < 0 )
         exit(EXIT_FAILURE);
 
     listen_socket = tcp_listen(8484);
