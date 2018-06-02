@@ -239,11 +239,11 @@ int load_ca_certificates(SSL_CTX *ctx)
     return 0;
 }
 
-static int check_common_name(const char *host, X509 *peer)
+static int check_common_name(const char *host, X509 *cert)
 {
     char peer_CN[256] = {0};
 
-    X509_NAME_get_text_by_NID(X509_get_subject_name(peer), NID_commonName, peer_CN, 256);
+    X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, peer_CN, 256);
     printf("peer_CN = %s, host = %s\n", peer_CN, host);
 
     if ( strcasecmp(peer_CN, host) )
@@ -254,24 +254,37 @@ static int check_common_name(const char *host, X509 *peer)
     return 0;
 }
 
-// See https://wiki.openssl.org/index.php/SSL/TLS_Client#Server_Certificate
+/*
+ * Extra checks are required for OpenSSL 1.02 or below.
+ *
+ * See https://wiki.openssl.org/index.php/SSL/TLS_Client#Server_Certificate
+ */
 int check_server_cert(SSL *ssl, const char *host)
 {
-    X509 *peer = NULL;
+    X509 *server_cert = NULL;
 
     // Get the server's certificate
-    peer = SSL_get_peer_certificate(ssl);
-    if (peer == NULL)
+    server_cert = SSL_get_peer_certificate(ssl);
+    if (server_cert == NULL)
     {
         fprintf(stderr, "%s: Server did not provide certificate\n", __func__);
         return -1;
     }
 
-    check_common_name(host, peer);
+    if ( SSL_get_verify_result(ssl) != X509_V_OK )
+    {
+        fprintf(stderr, "%s: Server certificate is not valid\n", __func__);
+        X509_free(server_cert);
+        return -1;
+    }
 
-    //TODO what else should we check?
-    // Don't we verify it against the CA?
+    if ( check_common_name(host, server_cert) < 0 )
+    {
+        X509_free(server_cert);
+        return -1;
+    }
 
+    X509_free(server_cert);
     return 0;
 }
 
