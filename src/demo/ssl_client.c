@@ -1,6 +1,7 @@
 // https://www.openssl.org/docs/man1.0.2/ssl/ssl.html
 // The link for SSL's BIO (Basic IO) is broken. Use this instead:
 // https://www.openssl.org/docs/man1.0.2/crypto/bio.html
+// https://www.openssl.org/docs/man1.0.2/crypto/SSL_load_error_strings.html
 
 #include <netdb.h>
 #include <stdio.h>
@@ -124,6 +125,8 @@ SSL_CTX *initialize_ssl_context(void)
         fprintf(stderr, "Failed to initialize SSL context\n");
     }
 
+    // Can also set the verify parameters for a specific SSL connection.
+
     /*
      * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
      * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
@@ -136,6 +139,10 @@ SSL_CTX *initialize_ssl_context(void)
      */
     SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
 
+    /*
+     * void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth);
+     */
+    // ?
     return ctx;
 }
 
@@ -247,6 +254,7 @@ static int check_common_name(const char *host, X509 *peer)
     return 0;
 }
 
+// See https://wiki.openssl.org/index.php/SSL/TLS_Client#Server_Certificate
 int check_server_cert(SSL *ssl, const char *host)
 {
     X509 *peer = NULL;
@@ -267,6 +275,17 @@ int check_server_cert(SSL *ssl, const char *host)
     return 0;
 }
 
+int load_ca_list(SSL_CTX *ctx, const char *ca_list)
+{
+    /* Load the CAs we trust*/
+    if( !SSL_CTX_load_verify_locations(ctx, ca_list, 0) )
+    {
+        fprintf(stderr, "Can't read CA list");
+        return -1;
+    }
+    return 0;
+}
+
 #define HOST        "localhost"
 #define PORT        "8484"
 int main(void)
@@ -278,6 +297,12 @@ int main(void)
     ctx = initialize_ssl_context();
     if (ctx == NULL)
         exit(EXIT_FAILURE);
+
+    if ( load_ca_list(ctx, CA_LIST) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
