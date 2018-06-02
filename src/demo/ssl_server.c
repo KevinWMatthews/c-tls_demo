@@ -240,7 +240,21 @@ SSL_CTX *initialize_ssl_context(void)
     }
 
     // ? #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
+    // ?
     SSL_CTX_set_verify_depth(ctx, 1);
+
+    /*
+     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
+     *
+     * verify_callback can be null
+     *
+     * Valid server options for mode:
+     *      SSL_VERIFY_NONE                     Do not send certificate request to client
+     *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
+     *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
+     *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
+     */
+    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
     return ctx;
 }
@@ -304,15 +318,14 @@ static int load_server_certificates(SSL_CTX *ctx)
     return 0;
 }
 
-#define CA_LIST         "../keys/ca.crt"
-int load_ca_certificates(SSL_CTX *ctx)
+int load_ca_list(SSL_CTX *ctx, const char *ca_list)
 {
     /*
      * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
      *
      * Returns 1 on success, 0 on failure.
      */
-    if ( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+    if ( !SSL_CTX_load_verify_locations(ctx, ca_list, 0) )
     {
         fprintf(stderr, "Failed to load CA cert\n");
         return -1;
@@ -321,6 +334,7 @@ int load_ca_certificates(SSL_CTX *ctx)
 }
 
 #define DHFILE      "../keys/dh1024.pem"
+#define CA_LIST         "../keys/ca.crt"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
@@ -336,8 +350,17 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    if ( load_server_certificates(ctx) < 0 )
+    if ( load_ca_list(ctx, CA_LIST) < 0 )
+    {
+        destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
+    }
+
+    if ( load_server_certificates(ctx) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     listen_socket = tcp_listen(8484);
     if (listen_socket < 0)

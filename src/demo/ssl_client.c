@@ -109,6 +109,7 @@ SSL_CTX *initialize_ssl_context(void)
     const SSL_METHOD *method = NULL;
     SSL_CTX *ctx = NULL;
 
+    // add_all_algorithms?
     SSL_library_init();
 
     method = SSLv23_method();
@@ -223,22 +224,6 @@ int ssl_connect(SSL *ssl)
     return ret;
 }
 
-#define CA_LIST         "../keys/ca.crt"
-int load_ca_certificates(SSL_CTX *ctx)
-{
-    /*
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
-     *
-     * Returns 1 on success, 0 on failure.
-     */
-    if ( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
-    {
-        fprintf(stderr, "Failed to load CA cert\n");
-        return -1;
-    }
-    return 0;
-}
-
 static int check_common_name(const char *host, X509 *cert)
 {
     char peer_CN[256] = {0};
@@ -290,7 +275,11 @@ int check_server_cert(SSL *ssl, const char *host)
 
 int load_ca_list(SSL_CTX *ctx, const char *ca_list)
 {
-    /* Load the CAs we trust*/
+    /*
+     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
+     *
+     * Returns 1 on success, 0 on failure.
+     */
     if( !SSL_CTX_load_verify_locations(ctx, ca_list, 0) )
     {
         fprintf(stderr, "Can't read CA list");
@@ -301,6 +290,7 @@ int load_ca_list(SSL_CTX *ctx, const char *ca_list)
 
 #define HOST        "localhost"
 #define PORT        "8484"
+#define CA_LIST         "../keys/ca.crt"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
