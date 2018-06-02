@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <openssl/ssl.h>
 
@@ -133,15 +134,78 @@ static void destroy_ssl_context(SSL_CTX *ctx)
     SSL_CTX_free(ctx);
 }
 
+/*
+ * Before we perform the SSL/TLS handshake, we must connect SSL's network layer using SSL_set_fd() or SSL_set_bio().
+ */
+static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
+{
+    SSL *ssl = NULL;
+    BIO *socket_bio = NULL;     // Basic IO for socket
+
+    /*
+     * SSL *SSL_new(SSL_CTX *ctx);
+     *
+     * Returns a pointer on success and NULL on failure.
+     */
+    ssl = SSL_new(ctx);
+    if (ssl == NULL)
+    {
+        fprintf(stderr, "Error creating SSL context\n");
+        return NULL;
+    }
+
+    /*
+     * BIO *BIO_new_socket(int sock, int close_flag);
+     *
+     * If set, close_flag will automatically close the socket when the bio is freed. Could be nice?
+     * The BIO is automatically freed when the corresponding SSL object is free. You'd better associate it with an SSL object?
+     * Returns a pointer on success and NULL on failure.
+     */
+    socket_bio = BIO_new_socket(socket_fd, BIO_NOCLOSE);
+    if (socket_bio == NULL)
+    {
+        fprintf(stderr, "Failed to create BIO for SSL socket\n");
+        SSL_free(ssl);
+        return NULL;
+    }
+
+    /*
+     * void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio);
+     *
+     * Set read and write Basic IO's for the SSL connection.
+     * Can not fail.
+     */
+    SSL_set_bio(ssl, socket_bio, socket_bio);
+
+    return 0;
+}
+
 int main(void)
 {
-    SSL_CTX *ctx = NULL;
+    int socket_fd = SOCKETFD_INVALID;
+    SSL_CTX *ctx = NULL;    // Context for SSL connection
+    SSL *ssl = NULL;        // Handle for individual SSL connection
 
     ctx = initialize_ssl_context();
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
-    tcp_connect("localhost", "8484");
+    socket_fd = tcp_connect("localhost", "8484");
+    if (socket_fd < 0)
+        exit(EXIT_FAILURE);
+
+    ssl = initialize_ssl_connection(ctx, socket_fd);
+    if (ssl == NULL)
+    {
+        close(socket_fd);
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
+
+    if ( close(socket_fd) < 0 )
+    {
+        perror("Failed to close socket");
+    }
 
     destroy_ssl_context(ctx);
 
