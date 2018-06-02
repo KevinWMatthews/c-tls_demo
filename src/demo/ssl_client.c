@@ -294,6 +294,57 @@ int check_server_cert(SSL *ssl, const char *host)
     return 0;
 }
 
+//TODO pass in the certificates and ca
+// Returns 0 on success, -1 on failure.
+#define CLIENT_CERT     "../keys/client.crt"
+#define CLIENT_KEY      "../keys/client.pem"
+static int load_client_certificates(SSL_CTX *ctx)
+{
+    /*
+     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file);
+     *
+     * SSL_CTX_use_certificate_chain_file() loads a certificate chain from file into ctx.
+     * The certificates must be in PEM format and must be sorted starting with the subject's certificate
+     * (actual client or server certificate), followed by intermediate CA certificates if applicable,
+     * and ending at the highest level (root) CA
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_certificate_chain_file(ctx, CLIENT_CERT) != 1 )
+    // if ( SSL_CTX_use_certificate_file(ctx, CLIENT_CERT, SSL_FILETYPE_PEM) != 1 )
+    {
+        fprintf(stderr, "Error loading server certificate chain\n");
+        return -1;
+    }
+
+
+    // Should enter passphrase
+    // SSL_CTX_set_default_passwd_cb()
+    // or
+    // SSL_CTX_set_default_passwd_cb()
+    /*
+     * int SSL_CTX_use_PrivateKey_file(SSL_CTX *ctx, const char *file, int type);
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_PrivateKey_file(ctx, CLIENT_KEY, SSL_FILETYPE_PEM) != 1 )
+    {
+        fprintf(stderr, "Error loading server private key\n");
+        return -1;
+    }
+
+    /*
+     * int SSL_CTX_check_private_key(const SSL_CTX *ctx);
+     */
+    if ( SSL_CTX_check_private_key(ctx) != 1 )
+    {
+        fprintf(stderr, "Failed to check private key\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 int load_ca_list(SSL_CTX *ctx, const char *ca_list)
 {
     /*
@@ -325,6 +376,12 @@ int main(void)
         exit(EXIT_FAILURE);
 
     if ( load_ca_list(ctx, CA_LIST) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
+
+    if ( load_client_certificates(ctx) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
