@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <openssl/ssl.h>
+
 #define SOCKETFD_INVALID        -1
 
 /*
@@ -95,8 +97,44 @@ int tcp_connect(const char *host, const char *port)
     return socket_fd;
 }
 
+SSL_CTX *initialize_ssl_context(void)
+{
+    const SSL_METHOD *method = NULL;
+    SSL_CTX *ctx = NULL;
+
+    SSL_library_init();
+
+    method = SSLv23_method();
+    // Can this fail?
+
+    ctx = SSL_CTX_new(method);
+    if (ctx == NULL)
+    {
+        fprintf(stderr, "Failed to initialize SSL context\n");
+    }
+
+    return ctx;
+}
+
+/*
+ * Free all SSL context resources
+ */
+static void destroy_ssl_context(SSL_CTX *ctx)
+{
+    SSL_CTX_free(ctx);
+}
+
 int main(void)
 {
+    SSL_CTX *ctx = NULL;
+
+    ctx = initialize_ssl_context();
+    if (ctx == NULL)
+        exit(EXIT_FAILURE);
+
     tcp_connect("localhost", "8484");
+
+    destroy_ssl_context(ctx);
+
     return 0;
 }
