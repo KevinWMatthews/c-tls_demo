@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <strings.h>
 
 #include <openssl/ssl.h>
 
@@ -219,6 +220,43 @@ int load_ca_certificates(SSL_CTX *ctx)
     return 0;
 }
 
+static int check_common_name(const char *host, X509 *peer)
+{
+    char peer_CN[256] = {0};
+
+    X509_NAME_get_text_by_NID(X509_get_subject_name(peer), NID_commonName, peer_CN, 256);
+    printf("peer_CN = %s, host = %s\n", peer_CN, host);
+
+    if ( strcasecmp(peer_CN, host) )
+    {
+        fprintf(stderr, "%s: Common name doesn't match host name\n", __func__);
+        return -1;
+    }
+    return 0;
+}
+
+int check_server_cert(SSL *ssl, const char *host)
+{
+    X509 *peer = NULL;
+
+    // Get the server's certificate
+    peer = SSL_get_peer_certificate(ssl);
+    if (peer == NULL)
+    {
+        fprintf(stderr, "%s: Server did not provide certificate\n", __func__);
+        return -1;
+    }
+
+    check_common_name(host, peer);
+
+    //TODO what else should we check?
+    // Don't we verify it against the CA?
+
+    return 0;
+}
+
+#define HOST        "localhost"
+#define PORT        "8484"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
@@ -229,7 +267,7 @@ int main(void)
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
-    socket_fd = tcp_connect("localhost", "8484");
+    socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
         exit(EXIT_FAILURE);
 
@@ -242,6 +280,8 @@ int main(void)
     }
 
     ssl_connect(ssl);
+
+    check_server_cert(ssl, HOST);
 
     fprintf(stderr, "Shutting down client\n");
     if ( close(socket_fd) < 0 )
