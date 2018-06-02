@@ -231,7 +231,6 @@ static void destroy_ssl_context(SSL_CTX *ctx)
 // Returns 0 on success, -1 on failure.
 #define SERVER_CERT     "../keys/server.crt"
 #define SERVER_KEY      "../keys/server.pem"
-#define CA_LIST         "../keys/ca.crt"
 static int load_server_certificates(SSL_CTX *ctx)
 {
     /*
@@ -275,6 +274,12 @@ static int load_server_certificates(SSL_CTX *ctx)
         return -1;
     }
 
+    return 0;
+}
+
+#define CA_LIST         "../keys/ca.crt"
+int load_ca_certificates(SSL_CTX *ctx)
+{
     /*
      * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
      *
@@ -285,7 +290,6 @@ static int load_server_certificates(SSL_CTX *ctx)
         fprintf(stderr, "Failed to load CA cert\n");
         return -1;
     }
-
     return 0;
 }
 

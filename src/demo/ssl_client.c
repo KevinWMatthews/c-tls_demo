@@ -203,6 +203,22 @@ int ssl_connect(SSL *ssl)
     return ret;
 }
 
+#define CA_LIST         "../keys/ca.crt"
+int load_ca_certificates(SSL_CTX *ctx)
+{
+    /*
+     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
+     *
+     * Returns 1 on success, 0 on failure.
+     */
+    if ( !SSL_CTX_load_verify_locations(ctx, CA_LIST, 0) )
+    {
+        fprintf(stderr, "Failed to load CA cert\n");
+        return -1;
+    }
+    return 0;
+}
+
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
