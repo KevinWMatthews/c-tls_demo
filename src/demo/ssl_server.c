@@ -74,6 +74,32 @@ int ssl_accept(SSL *ssl)
     return ret;
 }
 
+/*
+ * Set Diffie-Hellman parameters in SSL Context.
+ */
+int load_dh_params(SSL_CTX *ctx, char *file)
+{
+    DH *ret = 0;
+    BIO *bio = 0;
+
+    bio = BIO_new_file(file, "r");
+
+    if ( bio == NULL)
+    {
+        fprintf(stderr, "%s: Couldn't open DH file", __func__);
+        return -1;
+    }
+
+    ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+    BIO_free(bio);
+    if( SSL_CTX_set_tmp_dh(ctx,ret) < 0 )       // What does this do?
+    {
+        fprintf(stderr, "%s: Couldn't set DH parameters", __func__);
+        return -1;
+    }
+
+    return 0;
+}
 
 static int tcp_listen(unsigned int port)
 {
@@ -244,6 +270,7 @@ static int load_server_certificates(SSL_CTX *ctx)
      * Returns 1 on success, not 1 on error.
      */
     if ( SSL_CTX_use_certificate_chain_file(ctx, SERVER_CERT) != 1 )
+    // if ( SSL_CTX_use_certificate_file(ctx, SERVER_CERT, SSL_FILETYPE_PEM) != 1 )
     {
         fprintf(stderr, "Error loading server certificate chain\n");
         return -1;
@@ -293,6 +320,7 @@ int load_ca_certificates(SSL_CTX *ctx)
     return 0;
 }
 
+#define DHFILE      "../keys/dh1024.pem"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
@@ -301,6 +329,12 @@ int main(void)
     ctx = initialize_ssl_context();
     if (ctx == NULL)
         exit(EXIT_FAILURE);
+
+    if ( load_dh_params(ctx, DHFILE) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     if ( load_server_certificates(ctx) < 0 )
         exit(EXIT_FAILURE);
