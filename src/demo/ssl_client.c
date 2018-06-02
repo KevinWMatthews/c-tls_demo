@@ -10,8 +10,18 @@
 #include <strings.h>
 
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #define SOCKETFD_INVALID        -1
+
+// Handle to SSL Basic IO context for printing errors.
+static BIO *bio_err;
+
+static int ssl_print_error(char *string)
+{
+    BIO_printf(bio_err, "%s", string);      // Print user's string to BIO file handle
+    ERR_print_errors(bio_err);              // Print SSL errors
+}
 
 /*
  * Resolve the hostname into an IP address using getaddrinfo().
@@ -104,13 +114,24 @@ int tcp_connect(const char *host, const char *port)
     return socket_fd;
 }
 
+/*
+ * Do not call this function twice!
+ */
+void initialize_ssl_library(void)
+{
+    // add_all_algorithms?
+    SSL_library_init();
+
+    // Add SSL Basic IO construct for error handling.
+    bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
+    // I don't know how to free this.
+}
+
+
 SSL_CTX *initialize_ssl_context(void)
 {
     const SSL_METHOD *method = NULL;
     SSL_CTX *ctx = NULL;
-
-    // add_all_algorithms?
-    SSL_library_init();
 
     method = SSLv23_method();
     // Can this fail?
@@ -219,7 +240,7 @@ int ssl_connect(SSL *ssl)
     ret = SSL_connect(ssl);
     if ( ret <= 0 )
     {
-        fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
+        ssl_print_error("Failed to complete TLS handshake\n");
     }
     return ret;
 }
@@ -296,6 +317,8 @@ int main(void)
     int socket_fd = SOCKETFD_INVALID;
     SSL_CTX *ctx = NULL;    // Context for SSL connection
     SSL *ssl = NULL;        // Handle for individual SSL connection
+
+    initialize_ssl_library();
 
     ctx = initialize_ssl_context();
     if (ctx == NULL)
