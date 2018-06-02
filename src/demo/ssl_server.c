@@ -7,6 +7,74 @@
 
 #define SOCKETFD_INVALID        -1
 
+// Extract this?
+static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
+{
+    SSL *ssl = NULL;
+    BIO *socket_bio = NULL;     // Basic IO for socket
+
+    /*
+     * SSL *SSL_new(SSL_CTX *ctx);
+     *
+     * Returns a pointer on success and NULL on failure.
+     */
+    ssl = SSL_new(ctx);
+    if (ssl == NULL)
+    {
+        fprintf(stderr, "Error creating SSL context\n");
+        return NULL;
+    }
+
+    /*
+     * BIO *BIO_new_socket(int sock, int close_flag);
+     *
+     * If set, close_flag will automatically close the socket when the bio is freed. Could be nice?
+     * The BIO is automatically freed when the corresponding SSL object is free. You'd better associate it with an SSL object?
+     * Returns a pointer on success and NULL on failure.
+     */
+    socket_bio = BIO_new_socket(socket_fd, BIO_NOCLOSE);
+    if (socket_bio == NULL)
+    {
+        fprintf(stderr, "Failed to create BIO for SSL socket\n");
+        SSL_free(ssl);
+        return NULL;
+    }
+
+    /*
+     * void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio);
+     *
+     * Set read and write Basic IO's for the SSL connection.
+     * Can not fail.
+     */
+    SSL_set_bio(ssl, socket_bio, socket_bio);
+
+    return ssl;
+}
+
+int ssl_accept(SSL *ssl)
+{
+    int ret;
+
+    /*
+     * int SSL_accept(SSL *ssl);
+     *
+     * SSL_accept() waits for a TLS/SSL client to initiate the TLS/SSL handshake.
+     * The communication channel must already have been set and assigned to the ssl by setting an underlying BIO.
+     *
+     * Return values:
+     *      1 on success
+     *      0 if not successful but according to spec
+     *      < 0 on error
+     */
+    ret = SSL_accept(ssl);
+    if ( ret <= 0 )
+    {
+        fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
+    }
+    return ret;
+}
+
+
 static int tcp_listen(unsigned int port)
 {
     int socket_fd = SOCKETFD_INVALID;
@@ -51,12 +119,28 @@ static int tcp_listen(unsigned int port)
     return socket_fd;
 }
 
-void client_handler(int socket_fd)
+/*
+ * Create an SSL connection.
+ *
+ * Do not close the SSL context - this belongs to the parent process and is reused for each child.
+ */
+void client_handler(int socket_fd, SSL_CTX *ctx)
 {
     pid_t pid;
+    SSL *ssl = NULL;
 
     pid = getpid();
     printf("Entering client handler %d\n", pid);
+
+    ssl = initialize_ssl_connection(ctx, socket_fd);
+    if (ssl == NULL)
+    {
+        close(socket_fd);
+        _exit(EXIT_FAILURE);
+    }
+
+    ssl_accept(ssl);
+
     printf("Exiting client handler %d\n", pid);
     if ( close(socket_fd) < 0 )
     {
@@ -65,7 +149,7 @@ void client_handler(int socket_fd)
     _exit(EXIT_SUCCESS);
 }
 
-static void handle_incoming_connections(int listen_socket)
+static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
 {
     int socket_fd = SOCKETFD_INVALID;
     pid_t pid;
@@ -89,7 +173,7 @@ static void handle_incoming_connections(int listen_socket)
     else if (pid == 0)
     {
         // Child process
-        client_handler(socket_fd);
+        client_handler(socket_fd, ctx);
         fprintf(stderr, "Child process leaked!\n");
     }
     else
@@ -143,7 +227,6 @@ static void destroy_ssl_context(SSL_CTX *ctx)
     SSL_CTX_free(ctx);
 }
 
-
 int main(void)
 {
     SSL_CTX *ctx = NULL;
@@ -162,7 +245,7 @@ int main(void)
 
     while (1)
     {
-        handle_incoming_connections(listen_socket);
+        handle_incoming_connections(listen_socket, ctx);
     }
 
     printf("Exiting server\n");
