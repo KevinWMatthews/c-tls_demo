@@ -8,12 +8,14 @@ usage ()
     echo "$(basename $0) [OPTION] ... [CSR]"
     echo ""
     echo "Options:"
-    echo "  --print-csr     Print the contens of the CSR"
+    echo "  --print-key     Print the contents of the public key"
+    echo "  --print-csr     Print the contents of the CSR"
     echo ""
 }
 
 CSR=
-PRINT_CSR="-noout"      # Do not print by default
+PRINT_KEY="-noout"      # Do not print by default
+PRINT_CSR=""
 
 if [ $# -eq 0 ]; then
     echo "$(basename $0): Too few arguments"
@@ -25,8 +27,12 @@ POSITIONAL_ARGS=()
 while [ $# -gt 0 ]; do
     arg="$1"
     case $arg in
+        --print-key)
+            PRINT_KEY=""
+            shift
+            ;;
         --print-csr)
-            PRINT_CSR=""
+            PRINT_CSR="-text"
             shift
             ;;
         --help)
@@ -61,5 +67,6 @@ fi
 
 openssl req \
     -verify \
+    $PRINT_KEY \
     $PRINT_CSR \
     -in $CSR
