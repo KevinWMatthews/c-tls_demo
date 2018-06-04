@@ -313,7 +313,7 @@ static int load_client_certificates(SSL_CTX *ctx)
     if ( SSL_CTX_use_certificate_chain_file(ctx, CLIENT_CERT) != 1 )
     // if ( SSL_CTX_use_certificate_file(ctx, CLIENT_CERT, SSL_FILETYPE_PEM) != 1 )
     {
-        fprintf(stderr, "Error loading server certificate chain\n");
+        fprintf(stderr, "Error loading certificate chain\n");
         return -1;
     }
 
@@ -329,7 +329,7 @@ static int load_client_certificates(SSL_CTX *ctx)
      */
     if ( SSL_CTX_use_PrivateKey_file(ctx, CLIENT_KEY, SSL_FILETYPE_PEM) != 1 )
     {
-        fprintf(stderr, "Error loading server private key\n");
+        fprintf(stderr, "Error loading private key\n");
         return -1;
     }
 
