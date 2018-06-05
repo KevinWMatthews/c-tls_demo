@@ -1,0 +1,7 @@
+http://gagravarr.org/writing/openssl-certs/others.shtml#ca-openssl
+
+
+./generate_crt.sh config/client.cnf keys/client.pem keys/client.crt
+
+openssl x509 -noout -fingerprint -in ca-certificate-file
+ openssl x509 -noout -hash -in ca-certificate-file
