@@ -17,14 +17,35 @@
 // Handle to SSL Basic IO context for printing errors.
 static BIO *bio_err;
 
-static int ssl_print_error(char *string)
+
+
+/*
+ * Print custom user message to OpenSSL's error IO.
+ *
+ * Use for printing errors that occur in user code.
+ */
+//TODO add varargs?
+static void print_error(char *string)
 {
-    BIO_printf(bio_err, "%s", string);      // Print user's string to BIO file handle
-    ERR_print_errors(bio_err);              // Print SSL errors
+    // Print user's string to BIO file handle
+    BIO_printf(bio_err, "%s", string);
 }
 
 /*
+ * Print custom user message and OpenSSL's error message to SSL Basic IO handle.
+ *
+ * Use for printing details of errors that stem from the SSL library.
+ */
+static int ssl_print_error(char *string)
+{
+    print_error(string);
+    ERR_print_errors(bio_err);              // Print information on SSL library error
+}
+
+
+/*
  * Resolve the hostname into an IP address using getaddrinfo().
+ *
  * Dynamically allocates and stores result in an addrinfo struct.
  * This addrinfo is actually a linked list of all resolutions.
  *
@@ -33,7 +54,7 @@ static int ssl_print_error(char *string)
  */
 static struct addrinfo *resolve_hostname(const char *host, const char *port)
 {
-    struct addrinfo hints = {0};    // Criteria
+    struct addrinfo hints = {0};        // Criteria
     struct addrinfo *result = NULL;
     int ret;
 
@@ -58,8 +79,8 @@ static struct addrinfo *resolve_hostname(const char *host, const char *port)
 
 /*
  * Try to connect to each of the addresses in the linked list.
- * Exit on first success.
  *
+ * Exits on first success.
  * Returns socket descriptor on success, < 0 on failure.
  */
 static int connect_to_socket(struct addrinfo *addr_list)
@@ -69,7 +90,7 @@ static int connect_to_socket(struct addrinfo *addr_list)
     int ret;
 
     // getaddrinfo() returns a linked list of address structures.
-    // Try all of them
+    // Try each of them until one works.
     for (addr = addr_list; addr != NULL; addr = addr->ai_next)
     {
         socket_fd = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
@@ -86,14 +107,14 @@ static int connect_to_socket(struct addrinfo *addr_list)
 
     if (addr == NULL)
     {
-        fprintf(stderr, "Could not connect to socket\n");
+        print_error("Could not connect to socket\n");
         return SOCKETFD_INVALID;
     }
     return socket_fd;
 }
 
 /*
- * Connect to the host at the given port
+ * Connect to the host at the given port.
  *
  * Returns socket descriptor on success, < 0 on failure.
  */
@@ -115,6 +136,8 @@ int tcp_connect(const char *host, const char *port)
 }
 
 /*
+ * Initialize the SSL library and set up the IO handle for printing errors.
+ *
  * Do not call this function twice!
  */
 void initialize_ssl_library(void)
@@ -123,18 +146,22 @@ void initialize_ssl_library(void)
     SSL_library_init();
 
     // Add SSL Basic IO construct for error handling.
-    bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
-    // I don't know how to free this.
+    bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);      // I don't know if/how to free this.
 }
 
-
+/*
+ * Initialize and configure the SSL context.
+ *
+ * This context applies to all SSL connections made in the the program.
+ *
+ * Returns a pointer to the SSL context on success, NULL on error.
+ */
 SSL_CTX *initialize_ssl_context(void)
 {
     const SSL_METHOD *method = NULL;
     SSL_CTX *ctx = NULL;
 
-    method = SSLv23_method();
-    // Can this fail?
+    method = SSLv23_method();       // Can this fail?
 
     /*
      * SSL_CTX *SSL_CTX_new(const SSL_METHOD *method);
@@ -144,10 +171,9 @@ SSL_CTX *initialize_ssl_context(void)
     ctx = SSL_CTX_new(method);
     if (ctx == NULL)
     {
-        fprintf(stderr, "Failed to initialize SSL context\n");
+        ssl_print_error("Failed to create SSL context\n");
+        return NULL;
     }
-
-    // Can also set the verify parameters for a specific SSL connection.
 
     /*
      * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
@@ -159,20 +185,29 @@ SSL_CTX *initialize_ssl_context(void)
      *      SSL_VERIFY_NONE     Continue if server does not provide cert
      *      SSL_VERIFY_PEER     Fail if server does not provide cert
      */
+    // Could also set the verify parameters for a specific SSL connection.
     SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
 
     /*
      * void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth);
      */
-    // ?
+    // Should we do this?
+
     return ctx;
 }
 
 /*
- * Free all SSL context resources
+ * Free all SSL context resources... usually.
  */
 static void destroy_ssl_context(SSL_CTX *ctx)
 {
+    /*
+     * void SSL_CTX_free(SSL_CTX *ctx);
+     *
+     * SSL_CTX_free() decrements the reference count of ctx, and
+     * removes the SSL_CTX object pointed to by ctx and
+     * frees up the allocated memory if the the reference count has reached 0.
+     */
     SSL_CTX_free(ctx);
 }
 
@@ -192,7 +227,7 @@ static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
     ssl = SSL_new(ctx);
     if (ssl == NULL)
     {
-        fprintf(stderr, "Error creating SSL context\n");
+        ssl_print_error("Error creating SSL context\n");
         return NULL;
     }
 
@@ -206,7 +241,7 @@ static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
     socket_bio = BIO_new_socket(socket_fd, BIO_NOCLOSE);
     if (socket_bio == NULL)
     {
-        fprintf(stderr, "Failed to create BIO for SSL socket\n");
+        ssl_print_error("Failed to create BIO for SSL socket\n");
         SSL_free(ssl);
         return NULL;
     }
@@ -254,7 +289,7 @@ static int check_common_name(X509 *cert, const char *host)
 
     if ( strcasecmp(peer_CN, host) )
     {
-        fprintf(stderr, "%s: Common name doesn't match host name\n", __func__);
+        print_error("Common name doesn't match host name\n");
         return -1;
     }
     return 0;
@@ -273,14 +308,14 @@ int check_server_cert(SSL *ssl, const char *host)
     server_cert = SSL_get_peer_certificate(ssl);
     if (server_cert == NULL)
     {
-        fprintf(stderr, "%s: Server did not provide certificate\n", __func__);
+        print_error("Server did not provide certificate\n");
         return -1;
     }
 
     // Verify that the handshake was successful
     if ( SSL_get_verify_result(ssl) != X509_V_OK )
     {
-        fprintf(stderr, "%s: Server certificate is not valid\n", __func__);
+        print_error("Server certificate is not valid\n");
         X509_free(server_cert);
         return -1;
     }
@@ -315,12 +350,12 @@ static int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const c
     if ( SSL_CTX_use_certificate_chain_file(ctx, cert_file) != 1 )
     // if ( SSL_CTX_use_certificate_file(ctx, CLIENT_CERT, SSL_FILETYPE_PEM) != 1 )
     {
-        fprintf(stderr, "Error loading certificate chain\n");
+        ssl_print_error("Error loading certificate chain\n");
         return -1;
     }
 
 
-    // Should enter passphrase
+    //TODO Should enter passphrase for key?
     // SSL_CTX_set_default_passwd_cb()
     // or
     // SSL_CTX_set_default_passwd_cb()
@@ -331,7 +366,7 @@ static int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const c
      */
     if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) != 1 )
     {
-        fprintf(stderr, "Error loading private key\n");
+        ssl_print_error("Error loading private key\n");
         return -1;
     }
 
@@ -340,7 +375,7 @@ static int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const c
      */
     if ( SSL_CTX_check_private_key(ctx) != 1 )
     {
-        fprintf(stderr, "Failed to check private key\n");
+        ssl_print_error("Failed to check private key\n");
         return -1;
     }
 
@@ -356,7 +391,7 @@ int load_ca_list(SSL_CTX *ctx, const char *ca_list)
      */
     if( !SSL_CTX_load_verify_locations(ctx, ca_list, 0) )
     {
-        fprintf(stderr, "Can't read CA list");
+        ssl_print_error("Can't read CA list");
         return -1;
     }
     return 0;
