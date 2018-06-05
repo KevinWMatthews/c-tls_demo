@@ -389,7 +389,10 @@ int main(void)
 
     socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
+    {
+        destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
+    }
 
     ssl = initialize_ssl_connection(ctx, socket_fd);
     if (ssl == NULL)
