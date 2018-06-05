@@ -294,11 +294,11 @@ int check_server_cert(SSL *ssl, const char *host)
     return 0;
 }
 
-//TODO pass in the certificates and ca
-// Returns 0 on success, -1 on failure.
-#define CLIENT_CERT     "../keys/client.crt"
-#define CLIENT_KEY      "../keys/client.pem"
-static int load_client_certificates(SSL_CTX *ctx)
+/*
+ * Load certificate chain file and corresponding private key file, then check the private key.
+ * Returns 0 on success, -1 on failure.
+ */
+static int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const char *key_file)
 {
     /*
      * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file);
@@ -310,7 +310,7 @@ static int load_client_certificates(SSL_CTX *ctx)
      *
      * Returns 1 on success, not 1 on error.
      */
-    if ( SSL_CTX_use_certificate_chain_file(ctx, CLIENT_CERT) != 1 )
+    if ( SSL_CTX_use_certificate_chain_file(ctx, cert_file) != 1 )
     // if ( SSL_CTX_use_certificate_file(ctx, CLIENT_CERT, SSL_FILETYPE_PEM) != 1 )
     {
         fprintf(stderr, "Error loading certificate chain\n");
@@ -327,7 +327,7 @@ static int load_client_certificates(SSL_CTX *ctx)
      *
      * Returns 1 on success, not 1 on error.
      */
-    if ( SSL_CTX_use_PrivateKey_file(ctx, CLIENT_KEY, SSL_FILETYPE_PEM) != 1 )
+    if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) != 1 )
     {
         fprintf(stderr, "Error loading private key\n");
         return -1;
@@ -363,6 +363,8 @@ int load_ca_list(SSL_CTX *ctx, const char *ca_list)
 #define HOST        "localhost"
 #define PORT        "8484"
 #define CA_LIST         "../keys/ca.crt"
+#define CLIENT_CERT     "../keys/client.crt"
+#define CLIENT_KEY      "../keys/client.pem"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
@@ -381,7 +383,7 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    if ( load_client_certificates(ctx) < 0 )
+    if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
