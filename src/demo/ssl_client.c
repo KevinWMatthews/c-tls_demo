@@ -245,7 +245,7 @@ int ssl_connect(SSL *ssl)
     return ret;
 }
 
-static int check_common_name(const char *host, X509 *cert)
+static int check_common_name(X509 *cert, const char *host)
 {
     char peer_CN[256] = {0};
 
@@ -277,6 +277,7 @@ int check_server_cert(SSL *ssl, const char *host)
         return -1;
     }
 
+    // Verify that the handshake was successful
     if ( SSL_get_verify_result(ssl) != X509_V_OK )
     {
         fprintf(stderr, "%s: Server certificate is not valid\n", __func__);
@@ -284,7 +285,8 @@ int check_server_cert(SSL *ssl, const char *host)
         return -1;
     }
 
-    if ( check_common_name(host, server_cert) < 0 )
+    // Verify that the common name matches the host name
+    if ( check_common_name(server_cert, host) < 0 )
     {
         X509_free(server_cert);
         return -1;
