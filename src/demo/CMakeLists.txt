@@ -8,6 +8,8 @@ target_link_libraries(ssl_server
 )
 add_executable(ssl_client
     ssl_client.c
+    cdssl.h
+    cdssl.c
 )
 target_link_libraries(ssl_client
     PRIVATE

@@ -11,36 +11,9 @@
 
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include "cdssl.h"
 
 #define SOCKETFD_INVALID        -1
-
-// Handle to SSL Basic IO context for printing errors.
-static BIO *bio_err;
-
-
-
-/*
- * Print custom user message to OpenSSL's error IO.
- *
- * Use for printing errors that occur in user code.
- */
-//TODO add varargs?
-static void print_error(char *string)
-{
-    // Print user's string to BIO file handle
-    BIO_printf(bio_err, "%s", string);
-}
-
-/*
- * Print custom user message and OpenSSL's error message to SSL Basic IO handle.
- *
- * Use for printing details of errors that stem from the SSL library.
- */
-static int ssl_print_error(char *string)
-{
-    print_error(string);
-    ERR_print_errors(bio_err);              // Print information on SSL library error
-}
 
 
 /*
@@ -133,20 +106,6 @@ int tcp_connect(const char *host, const char *port)
     freeaddrinfo(addr_list);
 
     return socket_fd;
-}
-
-/*
- * Initialize the SSL library and set up the IO handle for printing errors.
- *
- * Do not call this function twice!
- */
-void initialize_ssl_library(void)
-{
-    // add_all_algorithms?
-    SSL_library_init();
-
-    // Add SSL Basic IO construct for error handling.
-    bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);      // I don't know if/how to free this.
 }
 
 /*
