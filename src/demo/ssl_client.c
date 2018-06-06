@@ -264,28 +264,28 @@ int main(void)
     ssl = initialize_ssl_connection(ctx, socket_fd);
     if (ssl == NULL)
     {
-        close(socket_fd);
         destroy_ssl_context(ctx);
+        close(socket_fd);
         exit(EXIT_FAILURE);
     }
 
     if ( ssl_connect(ssl) < 0 )
     {
-        close(socket_fd);
+        destroy_ssl_connection(ssl);
         destroy_ssl_context(ctx);
+        close(socket_fd);
         exit(EXIT_FAILURE);
     }
 
     check_server_cert(ssl, HOST);
 
     fprintf(stderr, "Shutting down client\n");
+    destroy_ssl_connection(ssl);
+    destroy_ssl_context(ctx);
     if ( close(socket_fd) < 0 )
     {
         perror("Failed to close socket");
     }
-
-    destroy_ssl_connection(ssl);
-    destroy_ssl_context(ctx);
 
     return 0;
 }
