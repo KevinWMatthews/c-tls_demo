@@ -12,6 +12,10 @@
 void initialize_ssl_library(void);
 
 /*
+ * The SSL library itself does not need to be uninitialized.
+ */
+
+/*
  * Initialize and configure the SSL context.
  *
  * This context applies to all SSL connections made in the the program.
@@ -20,6 +24,13 @@ void initialize_ssl_library(void);
  */
 SSL_CTX *initialize_ssl_context(void);
 
+/*
+ * Free all SSL context resources... usually.
+ *
+ * Decreases reference counter to context struct.
+ * Frees when the counter reaches 0.
+ */
+void destroy_ssl_context(SSL_CTX *ctx);
 
 /*
  * Create handle for an individual SSL connection.
@@ -30,6 +41,14 @@ SSL_CTX *initialize_ssl_context(void);
  * Returns a pointer to an SSL connection on success, NULL on failure.
  */
 SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd);
+
+/*
+ * Free all SSL connection resources... usually.
+ *
+ * Decreases reference counter to connection struct.
+ * Frees when the counter reaches 0.
+ */
+void destroy_ssl_connection(SSL *ssl);
 
 /*
  * Perform the TLS handshake.

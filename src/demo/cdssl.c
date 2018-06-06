@@ -124,6 +124,17 @@ SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
     return ssl;
 }
 
+void destroy_ssl_connection(SSL *ssl)
+{
+    /*
+     * void SSL_free(SSL *ssl);
+     * SSL_free() decrements the reference count of ssl, and
+     * removes the SSL structure pointed to by ssl and
+     * frees up the allocated memory if the reference count has reached 0.
+     */
+    SSL_free(ssl);
+}
+
 int ssl_connect(SSL *ssl)
 {
     int ret;
@@ -147,3 +158,14 @@ int ssl_connect(SSL *ssl)
     return ret;
 }
 
+void destroy_ssl_context(SSL_CTX *ctx)
+{
+    /*
+     * void SSL_CTX_free(SSL_CTX *ctx);
+     *
+     * SSL_CTX_free() decrements the reference count of ctx, and
+     * removes the SSL_CTX object pointed to by ctx and
+     * frees up the allocated memory if the the reference count has reached 0.
+     */
+    SSL_CTX_free(ctx);
+}

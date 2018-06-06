@@ -108,21 +108,6 @@ int tcp_connect(const char *host, const char *port)
     return socket_fd;
 }
 
-/*
- * Free all SSL context resources... usually.
- */
-static void destroy_ssl_context(SSL_CTX *ctx)
-{
-    /*
-     * void SSL_CTX_free(SSL_CTX *ctx);
-     *
-     * SSL_CTX_free() decrements the reference count of ctx, and
-     * removes the SSL_CTX object pointed to by ctx and
-     * frees up the allocated memory if the the reference count has reached 0.
-     */
-    SSL_CTX_free(ctx);
-}
-
 static int check_common_name(X509 *cert, const char *host)
 {
     char peer_CN[256] = {0};
@@ -299,6 +284,7 @@ int main(void)
         perror("Failed to close socket");
     }
 
+    destroy_ssl_connection(ssl);
     destroy_ssl_context(ctx);
 
     return 0;
