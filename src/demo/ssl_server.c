@@ -3,53 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <openssl/ssl.h>
+#include "cdssl.h"
 
 #define SOCKETFD_INVALID        -1
-
-// Extract this?
-static SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd)
-{
-    SSL *ssl = NULL;
-    BIO *socket_bio = NULL;     // Basic IO for socket
-
-    /*
-     * SSL *SSL_new(SSL_CTX *ctx);
-     *
-     * Returns a pointer on success and NULL on failure.
-     */
-    ssl = SSL_new(ctx);
-    if (ssl == NULL)
-    {
-        fprintf(stderr, "Error creating SSL context\n");
-        return NULL;
-    }
-
-    /*
-     * BIO *BIO_new_socket(int sock, int close_flag);
-     *
-     * If set, close_flag will automatically close the socket when the bio is freed. Could be nice?
-     * The BIO is automatically freed when the corresponding SSL object is free. You'd better associate it with an SSL object?
-     * Returns a pointer on success and NULL on failure.
-     */
-    socket_bio = BIO_new_socket(socket_fd, BIO_NOCLOSE);
-    if (socket_bio == NULL)
-    {
-        fprintf(stderr, "Failed to create BIO for SSL socket\n");
-        SSL_free(ssl);
-        return NULL;
-    }
-
-    /*
-     * void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio);
-     *
-     * Set read and write Basic IO's for the SSL connection.
-     * Can not fail.
-     */
-    SSL_set_bio(ssl, socket_bio, socket_bio);
-
-    return ssl;
-}
 
 int ssl_accept(SSL *ssl)
 {
@@ -213,134 +169,18 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
     }
 }
 
-/*
- * Initialize SSL library
- * Set TLS method
- * Load certificates
- *
- * Returns SSL context on success, NULL on failure.
- * The caller is responsible for freeing the SSL context using SSL_CTX_free().
- */
-SSL_CTX *initialize_ssl_context(void)
-{
-    const SSL_METHOD *method = NULL;
-    SSL_CTX *ctx;
-
-    SSL_library_init();
-    // SSL_Load_error_string();
-
-    method = SSLv23_method();       // Can limit to server_method() or _client_method()
-    // Can this fail?
-
-    // Can limit available methos using SSL_CTX_set_options()
-    ctx = SSL_CTX_new(method);
-    if (!ctx)
-    {
-        fprintf(stderr, "Failed to initialize SSL context\n");
-    }
-
-    // ? #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
-    // ?
-    SSL_CTX_set_verify_depth(ctx, 1);
-
-    /*
-     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
-     *
-     * verify_callback can be null
-     *
-     * Valid server options for mode:
-     *      SSL_VERIFY_NONE                     Do not send certificate request to client
-     *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
-     *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
-     *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
-     */
-    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-
-    return ctx;
-}
-
-/*
- * Free all SSL context resources
- */
-static void destroy_ssl_context(SSL_CTX *ctx)
-{
-    SSL_CTX_free(ctx);
-}
-
-//TODO pass in the certificates and ca
-// Returns 0 on success, -1 on failure.
-#define SERVER_CERT     "../keys/server.crt"
-#define SERVER_KEY      "../keys/server.pem"
-static int load_server_certificates(SSL_CTX *ctx)
-{
-    /*
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file);
-     *
-     * SSL_CTX_use_certificate_chain_file() loads a certificate chain from file into ctx.
-     * The certificates must be in PEM format and must be sorted starting with the subject's certificate
-     * (actual client or server certificate), followed by intermediate CA certificates if applicable,
-     * and ending at the highest level (root) CA
-     *
-     * Returns 1 on success, not 1 on error.
-     */
-    if ( SSL_CTX_use_certificate_chain_file(ctx, SERVER_CERT) != 1 )
-    // if ( SSL_CTX_use_certificate_file(ctx, SERVER_CERT, SSL_FILETYPE_PEM) != 1 )
-    {
-        fprintf(stderr, "Error loading server certificate chain\n");
-        return -1;
-    }
-
-
-    // Should enter passphrase
-    // SSL_CTX_set_default_passwd_cb()
-    // or
-    // SSL_CTX_set_default_passwd_cb()
-    /*
-     * int SSL_CTX_use_PrivateKey_file(SSL_CTX *ctx, const char *file, int type);
-     *
-     * Returns 1 on success, not 1 on error.
-     */
-    if ( SSL_CTX_use_PrivateKey_file(ctx, SERVER_KEY, SSL_FILETYPE_PEM) != 1 )
-    {
-        fprintf(stderr, "Error loading server private key\n");
-        return -1;
-    }
-
-    /*
-     * int SSL_CTX_check_private_key(const SSL_CTX *ctx);
-     */
-    if ( SSL_CTX_check_private_key(ctx) != 1 )
-    {
-        fprintf(stderr, "Failed to check private key\n");
-        return -1;
-    }
-
-    return 0;
-}
-
-int load_ca_list(SSL_CTX *ctx, const char *ca_list)
-{
-    /*
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
-     *
-     * Returns 1 on success, 0 on failure.
-     */
-    if ( !SSL_CTX_load_verify_locations(ctx, ca_list, 0) )
-    {
-        fprintf(stderr, "Failed to load CA cert\n");
-        return -1;
-    }
-    return 0;
-}
-
 #define DHFILE      "../keys/dh1024.pem"
 #define CA_LIST         "../keys/ca.crt"
+#define SERVER_CERT     "../keys/server.crt"
+#define SERVER_KEY      "../keys/server.pem"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
 
-    ctx = initialize_ssl_context();
+    initialize_ssl_library();
+
+    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -356,7 +196,7 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    if ( load_server_certificates(ctx) < 0 )
+    if ( load_certificate_and_key(ctx, SERVER_CERT, SERVER_KEY) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);

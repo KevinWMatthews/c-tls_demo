@@ -1,5 +1,7 @@
 add_executable(ssl_server
     ssl_server.c
+    cdssl.h
+    cdssl.c
 )
 target_link_libraries(ssl_server
     PRIVATE
