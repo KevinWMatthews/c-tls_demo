@@ -71,6 +71,22 @@ int ssl_connect(SSL *ssl);
  */
 int check_server_cert(SSL *ssl, const char *host);
 
+/*
+ * Load file containe list of trusted Certificate Authorities.
+ *
+ * Returns 0 on success, -1 on failure.
+ */
+int load_ca_list(SSL_CTX *ctx, const char *ca_list_file);
+
+/*
+ * Load certificate chain file and corresponding private key file, then verify the private key.
+ *
+ * TODO Should enter passphrase for key?
+ * Returns 0 on success, -1 on failure.
+ */
+int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const char *key_file);
+
+
 // Pull these private again?
 void print_error(char *string);
 int ssl_print_error(char *string);

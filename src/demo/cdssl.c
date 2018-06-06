@@ -216,3 +216,63 @@ int check_server_cert(SSL *ssl, const char *host)
     X509_free(server_cert);
     return 0;
 }
+
+int load_ca_list(SSL_CTX *ctx, const char *ca_list_file)
+{
+    /*
+     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath);
+     *
+     * Returns 1 on success, 0 on failure.
+     */
+    if( !SSL_CTX_load_verify_locations(ctx, ca_list_file, 0) )      // We could add a path.
+    {
+        ssl_print_error("Can't read CA list");
+        return -1;
+    }
+    return 0;
+}
+
+int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const char *key_file)
+{
+    /*
+     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file);
+     *
+     * SSL_CTX_use_certificate_chain_file() loads a certificate chain from file into ctx.
+     * The certificates must be in PEM format and must be sorted starting with the subject's certificate
+     * (actual client or server certificate), followed by intermediate CA certificates if applicable,
+     * and ending at the highest level (root) CA
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_certificate_chain_file(ctx, cert_file) != 1 )
+    // if ( SSL_CTX_use_certificate_file(ctx, CLIENT_CERT, SSL_FILETYPE_PEM) != 1 )
+    {
+        ssl_print_error("Error loading certificate chain\n");
+        return -1;
+    }
+
+    // SSL_CTX_set_default_passwd_cb()
+    // or
+    // SSL_CTX_set_default_passwd_cb()
+    /*
+     * int SSL_CTX_use_PrivateKey_file(SSL_CTX *ctx, const char *file, int type);
+     *
+     * Returns 1 on success, not 1 on error.
+     */
+    if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) != 1 )
+    {
+        ssl_print_error("Error loading private key\n");
+        return -1;
+    }
+
+    /*
+     * int SSL_CTX_check_private_key(const SSL_CTX *ctx);
+     */
+    if ( SSL_CTX_check_private_key(ctx) != 1 )
+    {
+        ssl_print_error("Failed to check private key\n");
+        return -1;
+    }
+
+    return 0;
+}
