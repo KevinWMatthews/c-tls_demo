@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 #include "cdssl.h"
 
 #define SOCKETFD_INVALID        -1
