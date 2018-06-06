@@ -164,6 +164,29 @@ int ssl_connect(SSL *ssl)
     return ret;
 }
 
+int ssl_accept(SSL *ssl)
+{
+    int ret;
+
+    /*
+     * int SSL_accept(SSL *ssl);
+     *
+     * SSL_accept() waits for a TLS/SSL client to initiate the TLS/SSL handshake.
+     * The communication channel must already have been set and assigned to the ssl by setting an underlying BIO.
+     *
+     * Return values:
+     *      1 on success
+     *      0 if not successful but according to spec
+     *      < 0 on error
+     */
+    ret = SSL_accept(ssl);
+    if ( ret <= 0 )
+    {
+        fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
+    }
+    return ret;
+}
+
 void destroy_ssl_context(SSL_CTX *ctx)
 {
     /*

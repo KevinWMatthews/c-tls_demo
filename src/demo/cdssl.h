@@ -64,7 +64,7 @@ SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd);
 void destroy_ssl_connection(SSL *ssl);
 
 /*
- * Perform the TLS handshake.
+ * Connect to a TLS server and perform the TLS handshake.
  *
  * Returns:
  *      1 if handshake succeeded
@@ -72,6 +72,18 @@ void destroy_ssl_connection(SSL *ssl);
  *      < 0 on error
  */
 int ssl_connect(SSL *ssl);
+
+/*
+ * Accept a connection request from a TLS client and respond to a TLS handhake.
+ *
+ * Blocking read - waits until a connection request is received.
+ *
+ * Returns:
+ *      1 if handshake succeeded
+ *      0 if handshake failed according to spec
+ *      < 0 on error
+ */
+int ssl_accept(SSL *ssl);
 
 /*
  * Explicitly check server certificate
