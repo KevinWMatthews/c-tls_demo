@@ -1,5 +1,6 @@
 #include "cdssl.h"
 #include <openssl/err.h>
+#include <strings.h>
 
 
 // Handle to SSL Basic IO context for printing errors.
@@ -168,4 +169,50 @@ void destroy_ssl_context(SSL_CTX *ctx)
      * frees up the allocated memory if the the reference count has reached 0.
      */
     SSL_CTX_free(ctx);
+}
+
+static int check_common_name(X509 *cert, const char *host)
+{
+    char peer_CN[256] = {0};
+
+    X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, peer_CN, 256);
+    printf("peer_CN = %s, host = %s\n", peer_CN, host);
+
+    if ( strcasecmp(peer_CN, host) )
+    {
+        print_error("Common name doesn't match host name\n");
+        return -1;
+    }
+    return 0;
+}
+
+int check_server_cert(SSL *ssl, const char *host)
+{
+    X509 *server_cert = NULL;
+
+    // Get the server's certificate
+    server_cert = SSL_get_peer_certificate(ssl);
+    if (server_cert == NULL)
+    {
+        print_error("Server did not provide certificate\n");
+        return -1;
+    }
+
+    // Verify that the handshake was successful
+    if ( SSL_get_verify_result(ssl) != X509_V_OK )
+    {
+        print_error("Server certificate is not valid\n");
+        X509_free(server_cert);
+        return -1;
+    }
+
+    // Verify that the common name matches the host name
+    if ( check_common_name(server_cert, host) < 0 )
+    {
+        X509_free(server_cert);
+        return -1;
+    }
+
+    X509_free(server_cert);
+    return 0;
 }

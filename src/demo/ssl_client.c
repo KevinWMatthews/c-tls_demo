@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <strings.h>
 
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -106,57 +105,6 @@ int tcp_connect(const char *host, const char *port)
     freeaddrinfo(addr_list);
 
     return socket_fd;
-}
-
-static int check_common_name(X509 *cert, const char *host)
-{
-    char peer_CN[256] = {0};
-
-    X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, peer_CN, 256);
-    printf("peer_CN = %s, host = %s\n", peer_CN, host);
-
-    if ( strcasecmp(peer_CN, host) )
-    {
-        print_error("Common name doesn't match host name\n");
-        return -1;
-    }
-    return 0;
-}
-
-/*
- * Extra checks are required for OpenSSL 1.02 or below.
- *
- * See https://wiki.openssl.org/index.php/SSL/TLS_Client#Server_Certificate
- */
-int check_server_cert(SSL *ssl, const char *host)
-{
-    X509 *server_cert = NULL;
-
-    // Get the server's certificate
-    server_cert = SSL_get_peer_certificate(ssl);
-    if (server_cert == NULL)
-    {
-        print_error("Server did not provide certificate\n");
-        return -1;
-    }
-
-    // Verify that the handshake was successful
-    if ( SSL_get_verify_result(ssl) != X509_V_OK )
-    {
-        print_error("Server certificate is not valid\n");
-        X509_free(server_cert);
-        return -1;
-    }
-
-    // Verify that the common name matches the host name
-    if ( check_common_name(server_cert, host) < 0 )
-    {
-        X509_free(server_cert);
-        return -1;
-    }
-
-    X509_free(server_cert);
-    return 0;
 }
 
 /*

@@ -60,6 +60,17 @@ void destroy_ssl_connection(SSL *ssl);
  */
 int ssl_connect(SSL *ssl);
 
+/*
+ * Explicitly check server certificate
+ *
+ * Extra checks are required for OpenSSL 1.02 or below:
+ *      Get the server's certificate
+ *      Verify that the handshake was successful
+ *      Verify that the common name matches the host name
+ * See https://wiki.openssl.org/index.php/SSL/TLS_Client#Server_Certificate
+ */
+int check_server_cert(SSL *ssl, const char *host);
+
 // Pull these private again?
 void print_error(char *string);
 int ssl_print_error(char *string);
