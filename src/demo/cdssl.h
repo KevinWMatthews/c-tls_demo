@@ -99,6 +99,12 @@ int load_ca_list(SSL_CTX *ctx, const char *ca_list_file);
  */
 int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const char *key_file);
 
+/*
+ * Set Diffie-Hellman parameters in SSL Context.
+ *
+ * Returns 0 on success, -1 on failure.
+ */
+int load_dh_params(SSL_CTX *ctx, char *file);
 
 // Pull these private again?
 void print_error(char *string);

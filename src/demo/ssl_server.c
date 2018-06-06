@@ -30,33 +30,6 @@ int ssl_accept(SSL *ssl)
     return ret;
 }
 
-/*
- * Set Diffie-Hellman parameters in SSL Context.
- */
-int load_dh_params(SSL_CTX *ctx, char *file)
-{
-    DH *ret = 0;
-    BIO *bio = 0;
-
-    bio = BIO_new_file(file, "r");
-
-    if ( bio == NULL)
-    {
-        fprintf(stderr, "%s: Couldn't open DH file", __func__);
-        return -1;
-    }
-
-    ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
-    BIO_free(bio);
-    if( SSL_CTX_set_tmp_dh(ctx,ret) < 0 )       // What does this do?
-    {
-        fprintf(stderr, "%s: Couldn't set DH parameters", __func__);
-        return -1;
-    }
-
-    return 0;
-}
-
 static int tcp_listen(unsigned int port)
 {
     int socket_fd = SOCKETFD_INVALID;
@@ -169,7 +142,7 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
     }
 }
 
-#define DHFILE      "../keys/dh1024.pem"
+#define DHFILE          "../keys/dh1024.pem"
 #define CA_LIST         "../keys/ca.crt"
 #define SERVER_CERT     "../keys/server.crt"
 #define SERVER_KEY      "../keys/server.pem"

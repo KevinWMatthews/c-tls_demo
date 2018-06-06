@@ -281,3 +281,27 @@ int load_certificate_and_key(SSL_CTX *ctx, const char *cert_file, const char *ke
 
     return 0;
 }
+
+int load_dh_params(SSL_CTX *ctx, char *file)
+{
+    DH *ret = 0;
+    BIO *bio = 0;
+
+    bio = BIO_new_file(file, "r");
+
+    if ( bio == NULL)
+    {
+        print_error("Couldn't open DH file");
+        return -1;
+    }
+
+    ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);     //TODO Document
+    BIO_free(bio);
+    if ( SSL_CTX_set_tmp_dh(ctx, ret) < 0 )         //TODO What does this do?
+    {
+        ssl_print_error("Couldn't set DH parameters");
+        return -1;
+    }
+
+    return 0;
+}
