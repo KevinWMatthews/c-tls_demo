@@ -15,14 +15,27 @@ void initialize_ssl_library(void);
  * The SSL library itself does not need to be uninitialized.
  */
 
+
 /*
  * Initialize and configure the SSL context.
  *
  * This context applies to all SSL connections made in the the program.
  *
+ * verify_options is a bitmask.
+ * Valid options for a client are:
+ *      SSL_VERIFY_NONE                     Continue if server does not provide cert
+ *      SSL_VERIFY_PEER                     Fail if server does not provide cert
+ *
+ * Valid options for a server are:
+ *      SSL_VERIFY_NONE                     Do not send certificate request to client
+ *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
+ *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
+ *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
+ *
  * Returns a pointer to the SSL context on success, NULL on error.
+ * The caller is responsible for freeing the SSL context using SSL_CTX_free().
  */
-SSL_CTX *initialize_ssl_context(void);
+SSL_CTX *initialize_ssl_context(int verify_options);
 
 /*
  * Free all SSL context resources... usually.

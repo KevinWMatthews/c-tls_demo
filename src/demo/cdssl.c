@@ -39,7 +39,7 @@ void initialize_ssl_library(void)
     bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);      // I don't know if/how to free this.
 }
 
-SSL_CTX *initialize_ssl_context(void)
+SSL_CTX *initialize_ssl_context(int verify_options)
 {
     const SSL_METHOD *method = NULL;
     SSL_CTX *ctx = NULL;
@@ -62,14 +62,19 @@ SSL_CTX *initialize_ssl_context(void)
      * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
      * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
      *
-     * Callback can be null.
+     * verify_callback can be null.
      *
      * Valid modes for a client are:
-     *      SSL_VERIFY_NONE     Continue if server does not provide cert
-     *      SSL_VERIFY_PEER     Fail if server does not provide cert
+     *      SSL_VERIFY_NONE                     Continue if server does not provide cert
+     *      SSL_VERIFY_PEER                     Fail if server does not provide cert
+     * Valid modes for a server server are:
+     *      SSL_VERIFY_NONE                     Do not send certificate request to client
+     *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
+     *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
+     *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
      */
-    // Could also set the verify parameters for a specific SSL connection.
-    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+    // Could also set the verify parameters for a specific SSL connection (created elsewhere).
+    SSL_CTX_set_verify(ctx, verify_options, NULL);
 
     /*
      * void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth);

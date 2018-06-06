@@ -121,7 +121,7 @@ int main(void)
 
     initialize_ssl_library();
 
-    ctx = initialize_ssl_context();
+    ctx = initialize_ssl_context(SSL_VERIFY_PEER);
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
