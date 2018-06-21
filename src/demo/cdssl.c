@@ -26,7 +26,8 @@ void print_error(char *string)
 int ssl_print_error(char *string)
 {
     print_error(string);
-    ERR_print_errors(bio_err);              // Print information on SSL library error
+    // ERR_print_errors(bio_err);              // Print information on SSL library error
+    ERR_print_errors_fp(stderr);
 }
 
 

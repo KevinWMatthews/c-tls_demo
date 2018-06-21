@@ -29,7 +29,8 @@ if [ -z $CRT ]; then
     exit 1
 fi
 
-
+# Generate private key and cert in one command
+# Could generate private key separately using 'openssl genersa'
 openssl req \
     -new \
     -x509 \

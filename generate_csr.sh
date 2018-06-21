@@ -41,6 +41,7 @@ if [ -z $CSR ]; then
     exit 1
 fi
 
+# Could generate private key separately using 'openssl genrsa'
 openssl req \
     -new \
     -config $CONFIG \

@@ -48,7 +48,6 @@ if [ -z $CRT ]; then
 fi
 
 
-#openssl ca -config config/client.cnf -keyfile keys/ca.pem -in keys/client.csr -out keys/client.crt
 openssl ca \
     -config $CONFIG \
     -keyfile $CA_KEY \

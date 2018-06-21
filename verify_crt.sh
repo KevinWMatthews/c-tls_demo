@@ -8,6 +8,7 @@ usage ()
     echo "Read a Certificate"
     echo ""
     echo "Options:"
+    echo "TODO are these names accurate?"
     echo "  --print-key     Print the contents of the public key"
     echo "  --print-crt     Print the contents of the certificate"
     echo ""
