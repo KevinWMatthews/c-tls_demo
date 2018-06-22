@@ -107,6 +107,7 @@ int tcp_connect(const char *host, const char *port)
 
 
 #define HOST            "localhost"
+// #define HOST            "10.0.1.34"
 #define PORT            "8484"
 #define CA_LIST         "../keys/ca.crt"
 #define CLIENT_CERT     "../keys/client.crt"
@@ -123,12 +124,14 @@ int main(void)
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
+    // Load CA list for doing server-side authentication
     if ( load_ca_list(ctx, CA_LIST) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
     }
 
+    // Load certificate and key for when server does client-side authentication
     if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
     {
         destroy_ssl_context(ctx);

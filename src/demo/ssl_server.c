@@ -129,8 +129,8 @@ int main(void)
     int listen_socket = SOCKETFD_INVALID;
 
     initialize_ssl_library();
-
-    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
+    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT);  // Request client certificate and fail if is not valid.
+    // ctx = initialize_ssl_context(SSL_VERIFY_NONE);      // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -140,13 +140,15 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    if ( load_ca_list(ctx, CA_LIST) < 0 )
+    // Load certificate and key for when client does server-side authentication.
+    if ( load_certificate_and_key(ctx, SERVER_CERT, SERVER_KEY) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
     }
 
-    if ( load_certificate_and_key(ctx, SERVER_CERT, SERVER_KEY) < 0 )
+    // Load CA list for doing client-side authentication
+    if ( load_ca_list(ctx, CA_LIST) < 0 )
     {
         destroy_ssl_context(ctx);
         exit(EXIT_FAILURE);
