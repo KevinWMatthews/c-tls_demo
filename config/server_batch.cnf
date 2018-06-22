@@ -20,7 +20,7 @@ localityName            = "Monterey"                # L
 organizationName        = "CyberData Corporation"   # O
 # Set organizationalUnitName to something unique to prevent database conflicts when signing the CSR with the CA key.
 # A certificate can not be issued twice.
-organizationalUnitName  = "Device1"                 # ON
+organizationalUnitName  = "Server1"                 # ON
 commonName              = "localhost"               # CN
 # emailAddress =
 # name
@@ -39,7 +39,6 @@ commonName              = "localhost"               # CN
 # organizationName        = "Enter your company name (min 1, max 42)"
 # organizationName_min    = 1
 # organizationName_max    = 42
-
 
 [ ca ]
 # See https://www.openssl.org/docs/manmaster/man1/ca.html
