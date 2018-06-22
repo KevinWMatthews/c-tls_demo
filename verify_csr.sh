@@ -8,14 +8,16 @@ usage ()
     echo "Verify Certificate Signing Request"
     echo ""
     echo "Options:"
+    echo "  --print-text    Print the plaintext of the CSR"
     echo "  --print-key     Print the contents of the public key"
     echo "  --print-csr     Print the contents of the CSR"
     echo ""
 }
 
 CSR=
-PRINT_KEY="-noout"      # Do not print by default
-PRINT_CSR=""
+PRINT_TEXT=""
+PRINT_KEY=""
+PRINT_CSR="-noout"      # Do not print by default
 
 if [ $# -eq 0 ]; then
     echo "$(basename $0): Too few arguments"
@@ -27,12 +29,16 @@ POSITIONAL_ARGS=()
 while [ $# -gt 0 ]; do
     arg="$1"
     case $arg in
+        --print-text)
+            PRINT_TEXT="-text"
+            shift
+            ;;
         --print-key)
-            PRINT_KEY=""
+            PRINT_KEY="-pubkey"
             shift
             ;;
         --print-csr)
-            PRINT_CSR="-text"
+            PRINT_CSR=""
             shift
             ;;
         --help)
@@ -67,6 +73,7 @@ fi
 
 openssl req \
     -verify \
+    $PRINT_TEXT \
     $PRINT_KEY \
     $PRINT_CSR \
     -in $CSR
