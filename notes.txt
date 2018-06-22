@@ -21,6 +21,11 @@ $ ./verify_csr.sh keys/client.csr
 $ ./sign_csr.sh keys/ca.key config/client.cnf keys/client.csr keys/client.crt
 $ ./verify_crt.sh keys/client.crt
 
+Generate Diffie-Hellman params for server app:
+$ ./generate_diffie_hellman_params.sh
+
+
+
 We could generate a Certificate Signing Request and send it off to a Certificate Authority for approval.
 For us, a self-signed certificate is sufficient.
 
