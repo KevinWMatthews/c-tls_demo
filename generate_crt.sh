@@ -5,13 +5,13 @@ usage ()
     echo ""
     echo "Generate self-signed certificate and private key"
     echo ""
-    echo "$(basename $0) [CONFIG] [PRIVATE_KEY] [CRT]"
+    echo "$(basename $0) [CONFIG] [PRIVATE_KEY] [CERT]"
     echo ""
 }
 
 CONFIG="$1"
 PRIVATE_KEY="$2"
-CRT="$3"
+CERT="$3"
 
 if [ -z $CONFIG ]; then
     echo "$(basename $0): Invalid CONFIG"
@@ -23,8 +23,8 @@ if [ -z $PRIVATE_KEY ]; then
     usage
     exit 1
 fi
-if [ -z $CRT ]; then
-    echo "$(basename $0): Invalid CRT"
+if [ -z $CERT ]; then
+    echo "$(basename $0): Invalid CERT"
     usage
     exit 1
 fi
@@ -35,6 +35,8 @@ openssl req \
     -new \
     -x509 \
     -days 1095 \
+    -inform PEM \
+    -outform PEM \
     -config $CONFIG \
     -keyout $PRIVATE_KEY \
-    -out $CRT
+    -out $CERT

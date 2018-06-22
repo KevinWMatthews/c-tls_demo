@@ -1,3 +1,9 @@
+Certificate genearation process:
+
+Generate Certificate Authority key and certificate:
+$ ./generate_crt.sh config/ca.cnf keys/ca_private.key ca_cert.crt
+
+
 We could generate a Certificate Signing Request and send it off to a Certificate Authority for approval.
 For us, a self-signed certificate is sufficient.
 

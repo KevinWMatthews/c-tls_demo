@@ -2,8 +2,8 @@
 # See also http://apfelboymchen.net/gnu/notes/openssl%20multidomain%20with%20config%20files.html
 [ req ]
 # input_password =                                    # Password for input private key file, if present. Override with -passin
-# output_password =                                   # Password for output private key, if created. Override with passout
-default_keyfile = keys/default.key                  # Default filename for private key. Override with -keyout
+# output_password =                                   # Password for output private key, if created. Override with -passout
+default_keyfile = keys/default.key                  # Default filename for private key, if created. Override with -keyout
 default_md = sha1                                   # Default encryption digest algorithm. Override using ?
 default_bits = 4096                                 # If used with -new, specify number of bits in key. Override with -newkey
 string_mask = utf8only                              # Permit only these characters
@@ -18,7 +18,7 @@ countryName             = "US"                      # C
 stateOrProvinceName     = "California"              # ST
 localityName            = "Monterey"                # L
 organizationName        = "CyberData Corporation"   # O
-# organizationalUnitName  =                           # ON
+organizationalUnitName  = "CyberData CA"            # ON
 commonName              = "CyberData"               # CN
 # emailAddress =
 # name
