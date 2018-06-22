@@ -17,10 +17,10 @@ prompt = no                                         # Read config file for Disti
 countryName             = "US"                      # C
 stateOrProvinceName     = "California"              # ST
 localityName            = "Monterey"                # L
+# The same organization can not have two CRT's from the same CSR.
+# To generate a second CRT, either generate a new CSR or change the organizationName.
 organizationName        = "CyberData Corporation"   # O
-#TODO change this to 'Server' or something to distinguish it from my device
-# This will prevent database conflicts
-# organizationalUnitName  =                           # ON
+organizationalUnitName  = "Server"                  # ON
 commonName              = "localhost"               # CN
 # emailAddress =
 # name
@@ -48,9 +48,9 @@ default_ca = CA_default
 [ CA_default ]
 
 dir             = ./keys
-serial          = $dir/serial.txt                        # Must be present and contain a valid serial number in hex.
-database        = $dir/index.txt                       # File must be present.
-new_certs_dir   = $dir/newcerts                   # Override with -outdir
+serial          = $dir/serial.txt                   # Must be present and contain a valid serial number in hex.
+database        = $dir/index.txt                    # File must be present.
+new_certs_dir   = $dir/certs                        # Override with -outdir
 certificate     = $dir/ca.crt                       # Override with -cert
 private_key     = $dir/ca.pem                       # Override with -keyfile
 default_days    = 1000
