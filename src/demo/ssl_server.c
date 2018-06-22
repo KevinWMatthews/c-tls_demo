@@ -121,8 +121,8 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
 
 #define DHFILE          "../keys/dh1024.pem"
 #define CA_LIST         "../keys/ca.crt"
-#define SERVER_CERT     "../keys/server.crt"
-#define SERVER_KEY      "../keys/server.key"
+#define SERVER_CERT     "../keys/server_ip.crt"
+#define SERVER_KEY      "../keys/server_ip.key"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
