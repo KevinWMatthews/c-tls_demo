@@ -34,6 +34,7 @@ fi
 openssl req \
     -new \
     -x509 \
+    -nodes \
     -days 1095 \
     -inform PEM \
     -outform PEM \
