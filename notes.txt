@@ -6,10 +6,21 @@ $ ./generate_crt.sh config/ca.cnf keys/ca_private.key ca_cert.crt
 Generate server Certificate Signing Request:
 $ ./generate_csr.sh 
 
+Sign Certificate Signing Request:
+$ ./sign_csr.sh
+
 
 We could generate a Certificate Signing Request and send it off to a Certificate Authority for approval.
 For us, a self-signed certificate is sufficient.
 
+Format of index.txt:
+  * Entry Type
+    - V (valid), R (Revoked), E (Expired)
+  * Expiration datetime
+  * Revocation datetime (if R)
+  * Serial Number
+  * Filename of Certificate
+  * Certificate Subject Name
 
 
 Encrypted with      Decrypted with
