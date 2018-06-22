@@ -3,9 +3,9 @@
 usage ()
 {
     echo ""
-    echo "Generate self-signed certificate and private key"
-    echo ""
     echo "$(basename $0) [CONFIG] [PRIVATE_KEY] [CERT]"
+    echo ""
+    echo "Generate self-signed certificate and private key"
     echo ""
 }
 

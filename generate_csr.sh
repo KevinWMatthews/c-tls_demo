@@ -3,9 +3,9 @@
 usage ()
 {
     echo ""
-    echo "Generate Certificate Signing Request and Private Key"
-    echo ""
     echo "$(basename $0) [CONFIG] [PRIVATE_KEY] [CSR]"
+    echo ""
+    echo "Generate Certificate Signing Request and Private Key"
     echo ""
     echo "This script creates a private key and a CSR."
     echo "It is possible to create a CSR from an existing CSR."

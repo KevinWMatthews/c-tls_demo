@@ -3,9 +3,9 @@
 usage ()
 {
     echo ""
-    echo "Verify Certificate Signing Request"
-    echo ""
     echo "$(basename $0) [OPTION] ... [CSR]"
+    echo ""
+    echo "Verify Certificate Signing Request"
     echo ""
     echo "Options:"
     echo "  --print-key     Print the contents of the public key"
