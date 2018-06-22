@@ -67,6 +67,7 @@ openssl ca \
     -keyform PEM \
     -config $CONFIG \
     -in $CSR \
+    -notext \
     -out $CERT
 
 if [ $? -ne 0 ]; then
