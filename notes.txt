@@ -1,14 +1,25 @@
 Certificate genearation process:
 
 Generate Certificate Authority key and certificate:
-$ ./generate_crt.sh config/ca.cnf keys/ca_private.key ca_cert.crt
+$ ./generate_crt.sh config/ca.cnf keys/ca.key keys/ca.crt
+$ ./verify_key.sh keys/ca.key
+$ ./verify_crt.sh keys/ca.crt
 
-Generate server Certificate Signing Request:
-$ ./generate_csr.sh 
+Generate Certificate Signing Request for server:
+$ ./generate_csr.sh config/server.cnf keys/server.key keys/server.csr
+$ ./verify_key.sh keys/server.key
+$ ./verify_csr.sh keys/server.csr
 
-Sign Certificate Signing Request:
-$ ./sign_csr.sh
+Sign Certificate Signing Request for server:
+$ ./sign_csr.sh keys/ca.key config/server.cnf keys/server.csr keys/server.crt
+$ ./verify_crt.sh keys/server.crt
 
+Generate and sign client certificate:
+$ ./generate_csr.sh config/client.cnf keys/client.key keys/client.csr
+$ ./verify_key.sh keys/client.key
+$ ./verify_csr.sh keys/client.csr
+$ ./sign_csr.sh keys/ca.key config/client.cnf keys/client.csr keys/client.crt
+$ ./verify_crt.sh keys/client.crt
 
 We could generate a Certificate Signing Request and send it off to a Certificate Authority for approval.
 For us, a self-signed certificate is sufficient.

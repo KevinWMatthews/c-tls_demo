@@ -19,7 +19,7 @@ usage ()
     echo ""
     echo "Sign a Certificate Signing Request using a Certifate Authority's self-signed certificate"
     echo ""
-    echo "Read device's (not CA's) config, input a device's CSR, sign with the CA's private key, output a new CERT for the device"
+    echo "Sign a CSR using the CA's private key. Read device's (not CA's) config, input a device's CSR, output a new CERT for the device."
 }
 
 if [ $# -lt 4 ]; then
