@@ -1,0 +1,60 @@
+# See https://www.openssl.org/docs/manmaster/man1/req.html, section "CONFIGURATION FILE FORMAT"
+# See also http://apfelboymchen.net/gnu/notes/openssl%20multidomain%20with%20config%20files.html
+[ req ]
+# input_password =                                    # Password for input private key file, if present. Override with -passin
+# output_password =                                   # Password for output private key, if created. Override with -passout
+default_keyfile = keys2/default.key                 # Default filename for private key, if created. Override with -keyout
+default_md = sha1                                   # Default encryption digest algorithm. Override using ?
+default_bits = 4096                                 # If used with -new, specify number of bits in key. Override with -newkey
+string_mask = utf8only                              # Permit only these characters
+distinguished_name = req_distinguished_name         # Specify config file section for Distinguished Name.
+prompt = no                                         # Read config file for Distinguished Name. Do not prompt user.
+req_extensions = req_ext                            # Specify config file section that extends the certificate request. Override with -reqexts
+# x509_extensions = x509_ext                          # Specify config file section that extends x509 certificates. Override with -extensions
+
+[ req_distinguished_name ]
+# If prompt = no, specify values for Distinguished Name
+countryName             = "US"                      # C
+stateOrProvinceName     = "California"              # ST
+localityName            = "Monterey"                # L
+organizationName        = "CyberData Corporation 2" # O
+organizationalUnitName  = "CyberData CA"            # ON
+commonName              = "CyberData2"              # CN
+# emailAddress =
+# name
+# surname
+# givenName
+# initials ?
+# dnQualifier
+
+# If prompt = yes, you may override the prompts for Distinguished Name
+# countryName             = "Enter a two-letter Country Name"
+# countryName_min         = 2
+# # countryName_max is always 2
+# stateOrProvinceName     = "Enter a full US State name"
+# stateOrProvinceName_min = 2                         # Weird, you can still leave it blank
+# localityName            = "Enter a city name"
+# organizationName        = "Enter your company name (min 1, max 42)"
+# organizationName_min    = 1
+# organizationName_max    = 42
+
+[ req_ext ]
+# See https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+# format:
+#   extension_name=[critical,] extensino_options
+# Add prefix critical if the extension is critical (what does that mean?)
+
+# Is the certificate a CA certificate? CA:[TRUE/FALSE]
+#   A CA certificate must set this to true.
+#   An end-user certificate must set this to false or omit it etirely
+# option: pathlen
+#   Specify number of certificates that can be below this in the chain
+#   (CA with 0 pathlen can only sign end-user certificates; not further CAs)
+basicConstraints = CA:TRUE
+# keyUsage =
+# extendedKeyUsage =
+subjectKeyIdentifier = hash     # Do this?
+# keyid     copy subject from parent certificate
+# issuer    copy issuer and serial number from issuer certificate
+authorityKeyIdentifier = keyid:always,issuer:always
+# ...
