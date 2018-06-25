@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+# Notice!
 # Prerequisites: these (specified by the corresponding .cnf file) must exist:
 #   new_certs_dir
 #   index.txt (must be empty or OpenSSL will silently fail)
 #   serial.txt, with a valid serial number in hex: xx
+#
+# Run:
+#   mkdir <keys_dir>/<new_certs_dir>
+#   touch <keys_dir>/index.txt
+#   echo '00' > <keys_dir>/serial.txt
 
 #https://www.sslshopper.com/article-most-common-openssl-commands.html
 #https://www.shellhacks.com/decode-csr/

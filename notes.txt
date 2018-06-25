@@ -11,7 +11,7 @@ $ ./verify_key.sh keys/server.key
 $ ./verify_csr.sh keys/server.csr
 
 Sign Certificate Signing Request for server:
-$ ./sign_csr.sh keys/ca.key config/server.cnf keys/server.csr keys/server.crt
+$ ./sign_csr.sh keys/ca.crt keys/ca.key config/server.cnf keys/server.csr keys/server.crt
 $ ./verify_crt.sh keys/server.crt
 
 Generate and sign client certificate:
