@@ -15,30 +15,35 @@ NEW_CERTS_DIR=certs
 usage ()
 {
     echo ""
-    echo "$(basename $0) [CA_KEY] [CONFIG] [CSR] [CERT]"
+    echo "$(basename $0) [CA_CERT] [CA_KEY] [CONFIG] [CSR] [CERT]"
     echo ""
     echo "Sign a Certificate Signing Request using a Certifate Authority's self-signed certificate"
     echo ""
     echo "Sign a CSR using the CA's private key. Read device's (not CA's) config, input a device's CSR, output a new CERT for the device."
 }
 
-if [ $# -lt 4 ]; then
+if [ $# -lt 5 ]; then
     echo "$(basename $0): Too few arguments"
     usage
     exit 1
 fi
 
-if [ $# -gt 4 ]; then
+if [ $# -gt 5 ]; then
     echo "$(basename $0): Too many arguments"
     usage
     exit 1
 fi
 
-CA_KEY="$1"
-CONFIG="$2"
-CSR="$3"
-CERT="$4"
+CA_CERT="$1"
+CA_KEY="$2"
+CONFIG="$3"
+CSR="$4"
+CERT="$5"
 
+if [ -z $CA_CERT ]; then
+    echo "$(basename $0): Invalid CA_CERT"
+    exit 1
+fi
 if [ -z $CA_KEY ]; then
     echo "$(basename $0): Invalid CA_KEY"
     exit 1
@@ -63,6 +68,7 @@ fi
 # -notext       Do not print the plaintext form of the certificate in the output file
 openssl ca \
     -batch \
+    -cert $CA_CERT \
     -keyfile $CA_KEY \
     -keyform PEM \
     -config $CONFIG \
