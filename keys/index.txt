@@ -4,3 +4,4 @@ V	210318204939Z		02	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Serve
 V	210318205144Z		03	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Device Unencrypted Key/CN=localhost
 V	210318232501Z		04	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Server/CN=10.0.1.34
 V	210318232555Z		05	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Device/CN=10.0.1.34
+V	210324183539Z		06	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Asterisk Server/CN=asterisk34
