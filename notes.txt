@@ -18,11 +18,11 @@ Generate and sign client certificate:
 $ ./generate_csr.sh config/client.cnf keys/client.key keys/client.csr
 $ ./verify_key.sh keys/client.key
 $ ./verify_csr.sh keys/client.csr
-$ ./sign_csr.sh keys/ca.key config/client.cnf keys/client.csr keys/client.crt
+$ ./sign_csr.sh keys/ca.crt keys/ca.key config/client.cnf keys/client.csr keys/client.crt
 $ ./verify_crt.sh keys/client.crt
 
 Generate Diffie-Hellman params for server app:
-$ ./generate_diffie_hellman_params.sh
+$ ./generate_diffie_hellman_params.sh keys/dh1024.pem
 
 
 
