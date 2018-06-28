@@ -1,0 +1,71 @@
+# See https://www.openssl.org/docs/manmaster/man1/req.html, section "CONFIGURATION FILE FORMAT"
+# See also http://apfelboymchen.net/gnu/notes/openssl%20multidomain%20with%20config%20files.html
+
+[ req ]
+# input_password =                                    # Password for input private key file, if present. Override with -passin
+output_password = asterisk34                        # Password for output private key, if created. Override with passout
+# default_keyfile =                                   # Default filename for private key. Override with -keyout
+default_md = sha1                                   # Default encryption digest algorithm. Override using ?
+default_bits = 4096                                 # If used with -new, specify number of bits in key. Override with -newkey
+string_mask = utf8only                              # Permit only these characters
+distinguished_name = req_distinguished_name         # Specify config file section for Distinguished Name.
+prompt = no                                         # Read config file for Distinguished Name. Do not prompt user.
+# req_extensions =                                    # Specify config file section that extends the certificate request. Override with -reqexts
+# x509_extensions =                                   # Specify config file section that extends x509 certificates. Override with -extensions
+
+[ req_distinguished_name ]
+# If prompt = no, specify values for Distinguished Name
+countryName             = "US"                          # C
+stateOrProvinceName     = "California"                  # ST
+localityName            = "Monterey"                    # L
+organizationName        = "CyberData Corporation"       # O
+organizationalUnitName  = "CyberData Asterisk Server"   # ON
+commonName              = "asterisk34.cyberdata.net"    # CN
+# emailAddress =
+# name
+# surname
+# givenName
+# initials ?
+# dnQualifier
+
+# If prompt = yes, you may override the prompts for Distinguished Name
+# countryName             = "Enter a two-letter Country Name"
+# countryName_min         = 2
+# # countryName_max is always 2
+# stateOrProvinceName     = "Enter a full US State name"
+# stateOrProvinceName_min = 2                         # Weird, you can still leave it blank
+# localityName            = "Enter a city name"
+# organizationName        = "Enter your company name (min 1, max 42)"
+# organizationName_min    = 1
+# organizationName_max    = 42
+
+
+[ ca ]
+# See https://www.openssl.org/docs/manmaster/man1/ca.html
+
+default_ca = CA_default
+
+[ CA_default ]
+
+dir             = ./keys
+serial          = $dir/serial.txt                   # Must be present and contain a valid serial number in hex.
+database        = $dir/index.txt                    # File must be present.
+new_certs_dir   = $dir/certs                        # Override with -outdir
+certificate     = $dir/ca.crt                       # Override with -cert
+private_key     = $dir/ca.pem                       # Override with -keyfile
+default_days    = 1000
+default_md      = sha1
+preserve        = no
+email_in_dn     = no
+policy          = policy_match
+
+
+# save and check these variables when validating certificates
+[ policy_match ]
+
+countryName = match                 # must match the CA
+stateOrProvinceName = match         # must match the CA
+organizationName = match            # must match the CA
+organizationalUnitName = optional   # will be saved but isn't required
+commonName = supplied               # required
+emailAddress = optional             # will be saved but isn't required
