@@ -65,6 +65,9 @@ if [ -z $CERT ]; then
     exit 1
 fi
 
+# -noout    Do not print the key
+# -text     Print the details of the certificate
+# -in       Input file (the certificate to check)
 openssl x509 \
     $PRINT_KEY \
     $PRINT_CRT \

@@ -28,6 +28,10 @@ usage ()
 # -state
 # -ssl3, -tls1, -tls1_1, -tls1_2, -tls1_3, -no_ssl3, -no_tls1, -no_tls1_1, -no_tls1_2, -no_tls1_3
 #                       Enable or disable specific protocols
+# -partial_chain        Do not require a root CA in the certificate chain
+
+# R to renegotiate
+# Q to quit
 
 # openssl s_client \
     # -connect localhost:8484 \
@@ -36,9 +40,16 @@ usage ()
     # -state
     # -brief \
 
+    # -CAfile /tftpboot/cert_vonage.pem \
+    # -CApath /etc/ssl/certs
 openssl s_client \
-    -connect 10.0.1.34:5061 \
-    -CAfile keys/ca.crt \
-    -key keys/client.key \
-    -cert keys/client.crt \
+    -connect sip-785500b.accounts.qa7.vocal-qa.com:10002 \
+    -CAfile /usr/share/ca-certificates/mozilla/DigiCert_Global_Root_CA.crt \
     -state
+
+# openssl s_client \
+    # -connect 10.0.1.34:5061 \
+    # -CAfile keys/ca.crt \
+    # -key keys/client.key \
+    # -cert keys/client.crt \
+    # -state
