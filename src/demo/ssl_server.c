@@ -119,6 +119,7 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
     }
 }
 
+#include <openssl/x509.h>
 // This hits twice? I wonder why.
 int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
@@ -142,14 +143,25 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
         return preverify_ok;
     }
 
-    fprintf(stderr, "Verifying \n");
+    fprintf(stderr, "\nReceived cert:\n");
     cdssl_print_x509_name(name);
 
-    char peer_common_name[64] = {0};
-    X509_NAME_get_text_by_NID(name, NID_commonName, peer_common_name, sizeof(peer_common_name));
+    char peer_cn[64] = {0};
+    X509_NAME_get_text_by_NID(name, NID_commonName, peer_cn, sizeof(peer_cn));
 
-    fprintf(stderr, "common name: %s\n", peer_common_name);
-    // Can't we just use X509_check_host?
+    fprintf(stderr, "Common Name: %s\n", peer_cn);
+
+#if 0
+#define MY_COMMON_NAME "common_name"
+    unsigned int flags = 0;     //TODO What are these?
+    char actual_peer_cn[64] = {0};
+    int ret;
+
+    ret = X509_check_host(cert, MY_COMMON_NAME, sizeof(MY_COMMON_NAME), flags, &actual_peer_cn);
+    fprintf(stderr, "ret: %d\n", ret);
+#endif
+
+    fprintf(stderr, "preverify_ok: %d\n", preverify_ok);
     return preverify_ok;
 }
 
@@ -162,6 +174,7 @@ int main(void)
     SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
 
+    fprintf(stderr, "%s\n", OpenSSL_version(OPENSSL_VERSION));      //TODO Extract this
     initialize_ssl_library();
     ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
     // ctx = initialize_ssl_context2(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
