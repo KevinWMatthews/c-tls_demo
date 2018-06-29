@@ -176,8 +176,8 @@ int main(void)
     int listen_socket = SOCKETFD_INVALID;
 
     initialize_ssl_library();
-    ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
-    // ctx = initialize_ssl_context2(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
+    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
+    // ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 

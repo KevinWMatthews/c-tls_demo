@@ -47,10 +47,13 @@ void initialize_ssl_library(void);
  * Returns a pointer to the SSL context on success, NULL on error.
  * The caller is responsible for freeing the SSL context using SSL_CTX_free().
  */
-SSL_CTX *initialize_ssl_context(int verify_options);
-SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *));
+SSL_CTX *initialize_ssl_context(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *));
 
+/*
+ *TODO document this
+ */
 void cdssl_print_x509_name(X509_NAME *name);
+
 /*
  * Free all SSL context resources... usually.
  *
