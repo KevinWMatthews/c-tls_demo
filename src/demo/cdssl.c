@@ -195,6 +195,56 @@ void destroy_ssl_connection(SSL *ssl)
     SSL_free(ssl);
 }
 
+int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int flags)
+{
+    // Taken from https://wiki.openssl.org/index.php/Hostname_validation
+    //
+    // There may be bugs:
+    //      OpenSSL ticket #3288
+    //      https://rt.openssl.org/Ticket/Display.html?id=3288&user=guest&pass=guest
+    //      https://groups.google.com/forum/#!topic/mailing.openssl.dev/YcJX0njO1oo
+    // See also https://tools.ietf.org/html/rfc6125
+
+    //NOTE this implementation is specific to ssl 1.0.0
+    // https://www.openssl.org/docs/man1.1.0/ssl/SSL_set_hostflags.html
+
+    /*
+     * Set parameters that OpenSSL will use when calling X509_check_host().
+     * "SSL clients are advised to use these functions in preference to explicitly calling X509_check_host".
+     */
+
+    /*
+     * void SSL_set_hostflags(SSL *s, unsigned int flags)
+     *
+     * Set flags that will be passed to to X509_check_host()
+     * [this function is called by OpenSSL].
+     */
+    SSL_set_hostflags(ssl, flags);
+
+    /*
+     * int SSL_set1_host(SSL *s, const char *hostname)
+     *
+     * Sets the hostname that will be checked by X509_check_host().
+     * [this function is called by OpenSSL].
+     * Removes any previously specified hostnames.
+     * If the hsotname is empty or NULL, common name checks are not performed.
+     *
+     * Returns values:
+     *      1 on success
+     *      0 on failure
+     */
+    if ( SSL_set1_host(ssl, common_name) == 0 )
+    {
+        ssl_print_error("Failed to set hostname for common name validation\n");
+        return -1;
+    }
+
+    //TODO implement for OpenSSL v1.0.2
+    // https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_set1_host.html
+
+    return 0;
+}
+
 int ssl_connect(SSL *ssl)
 {
     int ret;

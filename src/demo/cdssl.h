@@ -3,6 +3,7 @@
 
 // Technically we should hide this, but wrapping the SSL_CTX struct is more effort than this demo is worth.
 #include <openssl/ssl.h>
+#include <openssl/x509v3.h>
 
 /*
  * Initialize the SSL library and set up the IO handle for printing errors.
@@ -75,6 +76,44 @@ SSL *initialize_ssl_connection(SSL_CTX *ctx, int socket_fd);
  * Frees when the counter reaches 0.
  */
 void destroy_ssl_connection(SSL *ssl);
+
+
+/*
+ * Configure the Common Name check that OpenSSL perform when it receives a peer certificate.
+ * A Common Name check will *not* be performed unless this function is called.
+ * Must be called after SSL connection is initialized but before it is connected.
+ *
+ * Available flags are listed in <openssl/x509v3.h>
+ * or see https://www.openssl.org/docs/man1.0.2/crypto/X509_check_host.html:
+ *      Always check subject name for host match even if subject alt names present
+ *      # define X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT    0x1
+ *
+ *      Disable wildcard matching for dnsName fields and common name.
+ *      # define X509_CHECK_FLAG_NO_WILDCARDS    0x2
+ *
+ *      Wildcards must not match a partial label.
+ *      # define X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS 0x4
+ *
+ *      Allow (non-partial) wildcards to match multiple labels.
+ *      # define X509_CHECK_FLAG_MULTI_LABEL_WILDCARDS 0x8
+ *
+ *      Constraint verifier subdomain patterns to match a single labels.
+ *      # define X509_CHECK_FLAG_SINGLE_LABEL_SUBDOMAINS 0x10
+ *
+ *      Never check the subject CN
+ *      # define X509_CHECK_FLAG_NEVER_CHECK_SUBJECT    0x20
+ *
+ *      Match reference identifiers starting with "." to any sub-domain.
+ *      This is a non-public flag, turned on implicitly when the subject
+ *      reference identity is a DNS name.
+ *      # define _X509_CHECK_FLAG_DOT_SUBDOMAINS 0x8000
+ *
+ * The documentation states that these flags are found in <openssl/x509.h>
+ * I found then in <openssl/x509v3.h>
+ *
+ * Returns 0 on success, -1 on failure.
+ */
+int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int flags);
 
 /*
  * Connect to a TLS server and perform the TLS handshake.

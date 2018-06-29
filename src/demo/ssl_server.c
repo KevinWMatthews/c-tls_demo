@@ -55,6 +55,8 @@ static int tcp_listen(unsigned int port)
  * Create an SSL connection.
  *
  * Do not close the SSL context - this belongs to the parent process and is reused for each child.
+ *
+ * Call _exit() instead of exit() - this does not call teadrown functions
  */
 void client_handler(int socket_fd, SSL_CTX *ctx)
 {
@@ -66,6 +68,12 @@ void client_handler(int socket_fd, SSL_CTX *ctx)
 
     ssl = initialize_ssl_connection(ctx, socket_fd);
     if (ssl == NULL)
+    {
+        close(socket_fd);
+        _exit(EXIT_FAILURE);
+    }
+
+    if ( cdssl_verify_common_name(ssl, "localhost", X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS) < 0 )
     {
         close(socket_fd);
         _exit(EXIT_FAILURE);
@@ -119,27 +127,26 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
     }
 }
 
-#include <openssl/x509.h>
-// This hits twice? I wonder why.
 int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
     if (preverify_ok == 0)
     {
-        fprintf(stderr, "cert verification error\n");
+        fprintf(stderr, "OpenSSL rejected certificate\n");
+        fprintf(stderr, "TODO print error details\n");
         return preverify_ok;
     }
 
     X509 * cert = X509_STORE_CTX_get_current_cert(x509_ctx);
     if (!cert)
     {
-        fprintf(stderr, "failed to get cert\n");
+        fprintf(stderr, "Failed to get cert\n");
         return preverify_ok;
     }
 
     X509_NAME *name = X509_get_subject_name(cert);
     if (!name)
     {
-        fprintf(stderr, "failed to get subject name\n");
+        fprintf(stderr, "Failed to get subject name\n");
         return preverify_ok;
     }
 
@@ -151,17 +158,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 
     fprintf(stderr, "Common Name: %s\n", peer_cn);
 
-#if 0
-#define MY_COMMON_NAME "common_name"
-    unsigned int flags = 0;     //TODO What are these?
-    char actual_peer_cn[64] = {0};
-    int ret;
-
-    ret = X509_check_host(cert, MY_COMMON_NAME, sizeof(MY_COMMON_NAME), flags, &actual_peer_cn);
-    fprintf(stderr, "ret: %d\n", ret);
-#endif
-
-    fprintf(stderr, "preverify_ok: %d\n", preverify_ok);
+    fprintf(stderr, "Cert verification result: %d\n", preverify_ok);
     return preverify_ok;
 }
 
@@ -169,12 +166,17 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define CA_LIST         "../keys/ca.crt"
 #define SERVER_CERT     "../keys/server_localhost.crt"
 #define SERVER_KEY      "../keys/server_localhost.key"
+// #define SERVER_CERT     "../keys/server_ip.crt"
+// #define SERVER_KEY      "../keys/server_ip.key"
+// #define CLIENT_CERT     "../keys/server_asterisk34.crt"
+// #define CLIENT_KEY      "../keys/server_asterisk34.key"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
 
     fprintf(stderr, "%s\n", OpenSSL_version(OPENSSL_VERSION));      //TODO Extract this
+
     initialize_ssl_library();
     ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
     // ctx = initialize_ssl_context2(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
@@ -210,6 +212,7 @@ int main(void)
 
     while (1)
     {
+        // Common name verification is established on a per-connection basis
         handle_incoming_connections(listen_socket, ctx);
     }
 

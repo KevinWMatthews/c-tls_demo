@@ -105,11 +105,47 @@ int tcp_connect(const char *host, const char *port)
     return socket_fd;
 }
 
+int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
+{
+    if (preverify_ok == 0)
+    {
+        fprintf(stderr, "OpenSSL rejected certificate\n");
+        fprintf(stderr, "TODO print error details\n");
+        return preverify_ok;
+    }
+
+    X509 * cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+    if (!cert)
+    {
+        fprintf(stderr, "Failed to get cert\n");
+        return preverify_ok;
+    }
+
+    X509_NAME *name = X509_get_subject_name(cert);
+    if (!name)
+    {
+        fprintf(stderr, "Failed to get subject name\n");
+        return preverify_ok;
+    }
+
+    fprintf(stderr, "\nReceived cert:\n");
+    cdssl_print_x509_name(name);
+
+    char peer_cn[64] = {0};
+    X509_NAME_get_text_by_NID(name, NID_commonName, peer_cn, sizeof(peer_cn));
+
+    fprintf(stderr, "Common Name: %s\n", peer_cn);
+
+    fprintf(stderr, "Cert verification result: %d\n", preverify_ok);
+    return preverify_ok;
+}
 
 #define HOST            "localhost"
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
 #define CA_LIST         "../keys/ca.crt"
+// #define CLIENT_CERT     "../keys/client_ip.crt"
+// #define CLIENT_KEY      "../keys/client_ip.key"
 #define CLIENT_CERT     "../keys/client_localhost.crt"
 #define CLIENT_KEY      "../keys/client_localhost.key"
 int main(void)
@@ -120,7 +156,7 @@ int main(void)
 
     initialize_ssl_library();
 
-    ctx = initialize_ssl_context(SSL_VERIFY_PEER);
+    ctx = initialize_ssl_context2(SSL_VERIFY_PEER, verify_callback);
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -153,6 +189,13 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
+    if ( cdssl_verify_common_name(ssl, HOST, 0) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        close(socket_fd);
+        exit(EXIT_FAILURE);
+    }
+
     if ( ssl_connect(ssl) < 0 )
     {
         destroy_ssl_connection(ssl);
@@ -160,8 +203,6 @@ int main(void)
         close(socket_fd);
         exit(EXIT_FAILURE);
     }
-
-    check_server_cert(ssl, HOST);
 
     fprintf(stderr, "Shutting down client\n");
     destroy_ssl_connection(ssl);
