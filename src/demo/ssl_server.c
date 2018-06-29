@@ -175,8 +175,6 @@ int main(void)
     SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
 
-    fprintf(stderr, "%s\n", OpenSSL_version(OPENSSL_VERSION));      //TODO Extract this
-
     initialize_ssl_library();
     ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
     // ctx = initialize_ssl_context2(SSL_VERIFY_NONE, NULL);       // Do not request client certificate

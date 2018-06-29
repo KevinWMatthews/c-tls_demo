@@ -45,6 +45,9 @@ void initialize_ssl_library(void)
 
     // Add SSL Basic IO construct for error handling.
     bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);      // I don't know if/how to free this.
+
+    //TODO add varargs support to local print() functions
+    fprintf(stderr, "%s\n", OpenSSL_version(OPENSSL_VERSION));
 }
 
 SSL_CTX *initialize_ssl_context(int verify_options)
