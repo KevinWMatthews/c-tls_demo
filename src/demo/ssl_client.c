@@ -109,9 +109,9 @@ int tcp_connect(const char *host, const char *port)
 #define HOST            "localhost"
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
-#define CA_LIST         "../keys2/ca2.crt"
-#define CLIENT_CERT     "../keys2/client2.crt"
-#define CLIENT_KEY      "../keys2/client2.key"
+#define CA_LIST         "../keys/ca.crt"
+#define CLIENT_CERT     "../keys/client_localhost.crt"
+#define CLIENT_KEY      "../keys/client_localhost.key"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;

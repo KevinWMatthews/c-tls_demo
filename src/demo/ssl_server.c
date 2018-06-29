@@ -165,10 +165,10 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
     return preverify_ok;
 }
 
-#define DHFILE          "../keys2/dh1024.pem"
-#define CA_LIST         "../keys2/ca2.crt"
-#define SERVER_CERT     "../keys2/server2.crt"
-#define SERVER_KEY      "../keys2/server2.key"
+#define DHFILE          "../keys/dh1024.pem"
+#define CA_LIST         "../keys/ca.crt"
+#define SERVER_CERT     "../keys/server_localhost.crt"
+#define SERVER_KEY      "../keys/server_localhost.key"
 int main(void)
 {
     SSL_CTX *ctx = NULL;
