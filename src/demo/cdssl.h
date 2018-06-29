@@ -32,10 +32,21 @@ void initialize_ssl_library(void);
  *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
  *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
  *
+ * OpenSSL will call verify_callback during the certificate verification process.
+ * It will only hit if SSL_VERIFY_PEER is set.
+ * The signature is:
+ *      int (*verify_callback)(int preverify_ok, X509_STORE_CTX *x509_ctx)
+ *  preverify_ok is the current status of the OpenSSL verification: 1 for success, 0 for failure.
+ *  x509_ctx is the complete X509 certificate chain context.
+ *  The return value will alter/override OpenSSL's verification result: 1 for success, 0 for failure.
+ *
+ * verify_callback can be NULL, in which case the value of OpenSSL verification is used.
+ *
  * Returns a pointer to the SSL context on success, NULL on error.
  * The caller is responsible for freeing the SSL context using SSL_CTX_free().
  */
 SSL_CTX *initialize_ssl_context(int verify_options);
+SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *));
 
 /*
  * Free all SSL context resources... usually.

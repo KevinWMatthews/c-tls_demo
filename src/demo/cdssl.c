@@ -85,6 +85,57 @@ SSL_CTX *initialize_ssl_context(int verify_options)
     return ctx;
 }
 
+SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *))
+{
+    const SSL_METHOD *method = NULL;
+    SSL_CTX *ctx = NULL;
+
+    method = SSLv23_method();       // Can this fail?
+
+    /*
+     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *method);
+     *
+     * Returns pointer to SSL_CTX struct on success, NULL on failure.
+     */
+    ctx = SSL_CTX_new(method);
+    if (ctx == NULL)
+    {
+        ssl_print_error("Failed to create SSL context\n");
+        return NULL;
+    }
+
+    /*
+     * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
+     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
+     *
+     * verify_callback can be null.
+     *
+     * Valid modes for a client are:
+     *      SSL_VERIFY_NONE                     Continue if server does not provide cert
+     *      SSL_VERIFY_PEER                     Fail if server does not provide cert
+     * Valid modes for a server server are:
+     *      SSL_VERIFY_NONE                     Do not send certificate request to client
+     *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
+     *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
+     *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
+     */
+    // Could also set the verify parameters for a specific SSL connection (created elsewhere).
+    SSL_CTX_set_verify(ctx, verify_options, NULL);
+
+    if (verify_callback)
+    {
+        fprintf(stderr, "has verify callback\n");
+    }
+
+    /*
+     * void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth);
+     */
+    // Should we do this?
+
+    return ctx;
+}
+
+
 /*
  * Before we perform the SSL/TLS handshake, we must connect SSL's network layer using SSL_set_fd() or SSL_set_bio().
  */
