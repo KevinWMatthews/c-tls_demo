@@ -31,6 +31,13 @@ int ssl_print_error(char *string)
 }
 
 
+void cdssl_print_x509_name(X509_NAME *name)
+{
+    X509_NAME_print_ex(bio_err, name, 0, 0);
+    BIO_printf(bio_err, "\n");
+}
+
+
 void initialize_ssl_library(void)
 {
     // add_all_algorithms?
@@ -108,8 +115,6 @@ SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int,
      * https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_verify.html
      * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*verify_callback)(int, X509_STORE_CTX *));
      *
-     * verify_callback can be null.
-     *
      * Valid modes for a client are:
      *      SSL_VERIFY_NONE                     Continue if server does not provide cert
      *      SSL_VERIFY_PEER                     Fail if server does not provide cert
@@ -118,14 +123,11 @@ SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int,
      *      SSL_VERIFY_PEER                     Send certificate request. Client need not provide cert.
      *      SSL_VERIFY_FAIL_IF_NO_PEER_CERT     Fail if client does not provide cert. Must be used with SSL_VERIFY_PEER.
      *      SSL_VERIFY_CLIENT_ONCE              Only request client cert once.  Must be used with SSL_VERIFY_PEER.
+     *
+     * verify_callback can be NULL.
      */
     // Could also set the verify parameters for a specific SSL connection (created elsewhere).
-    SSL_CTX_set_verify(ctx, verify_options, NULL);
-
-    if (verify_callback)
-    {
-        fprintf(stderr, "has verify callback\n");
-    }
+    SSL_CTX_set_verify(ctx, verify_options, verify_callback);
 
     /*
      * void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth);

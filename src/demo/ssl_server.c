@@ -119,6 +119,40 @@ static void handle_incoming_connections(int listen_socket, SSL_CTX *ctx)
     }
 }
 
+// This hits twice? I wonder why.
+int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
+{
+    if (preverify_ok == 0)
+    {
+        fprintf(stderr, "cert verification error\n");
+        return preverify_ok;
+    }
+
+    X509 * cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+    if (!cert)
+    {
+        fprintf(stderr, "failed to get cert\n");
+        return preverify_ok;
+    }
+
+    X509_NAME *name = X509_get_subject_name(cert);
+    if (!name)
+    {
+        fprintf(stderr, "failed to get subject name\n");
+        return preverify_ok;
+    }
+
+    fprintf(stderr, "Verifying \n");
+    cdssl_print_x509_name(name);
+
+    char peer_common_name[64] = {0};
+    X509_NAME_get_text_by_NID(name, NID_commonName, peer_common_name, sizeof(peer_common_name));
+
+    fprintf(stderr, "common name: %s\n", peer_common_name);
+    // Can't we just use X509_check_host?
+    return preverify_ok;
+}
+
 #define DHFILE          "../keys2/dh1024.pem"
 #define CA_LIST         "../keys2/ca2.crt"
 #define SERVER_CERT     "../keys2/server2.crt"
@@ -129,8 +163,8 @@ int main(void)
     int listen_socket = SOCKETFD_INVALID;
 
     initialize_ssl_library();
-    ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, 0);  // Request client certificate and fail if is not valid.
-    // ctx = initialize_ssl_context(SSL_VERIFY_NONE);      // Do not request client certificate
+    ctx = initialize_ssl_context2(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
+    // ctx = initialize_ssl_context2(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 

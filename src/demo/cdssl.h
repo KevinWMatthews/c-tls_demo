@@ -34,7 +34,8 @@ void initialize_ssl_library(void);
  *
  * OpenSSL will call verify_callback during the certificate verification process.
  * It will only hit if SSL_VERIFY_PEER is set.
- * The signature is:
+ *
+ * verify_callback's full signature is:
  *      int (*verify_callback)(int preverify_ok, X509_STORE_CTX *x509_ctx)
  *  preverify_ok is the current status of the OpenSSL verification: 1 for success, 0 for failure.
  *  x509_ctx is the complete X509 certificate chain context.
@@ -48,6 +49,7 @@ void initialize_ssl_library(void);
 SSL_CTX *initialize_ssl_context(int verify_options);
 SSL_CTX *initialize_ssl_context2(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *));
 
+void cdssl_print_x509_name(X509_NAME *name);
 /*
  * Free all SSL context resources... usually.
  *
