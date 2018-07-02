@@ -7,3 +7,4 @@ V	210318232555Z		05	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Devic
 V	210324183539Z		06	unknown	/C=US/ST=California/O=CyberData Corporation/OU=Asterisk Server/CN=asterisk34
 V	210324230355Z		07	unknown	/C=US/ST=California/O=CyberData Corporation/OU=CyberData Asterisk Server/CN=asterisk34.cyberdata.net
 V	210328205011Z		08	unknown	/C=US/ST=California/O=CyberData Corporation/OU=CyberData Asterisk Server/CN=asterisk*.cyberdata.net
+V	210328211259Z		09	unknown	/C=US/ST=California/O=CyberData Corporation/OU=CyberData Asterisk Server/CN=*.cyberdata.net
