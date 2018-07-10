@@ -316,7 +316,7 @@ int load_ca_list(SSL_CTX *ctx, const char *ca_list_file)
      */
     if( !SSL_CTX_load_verify_locations(ctx, ca_list_file, 0) )      // We could add a path.
     {
-        ssl_print_error("Can't read CA list");
+        ssl_print_error("Can't read CA list\n");
         return -1;
     }
     return 0;
@@ -384,7 +384,7 @@ int load_dh_params(SSL_CTX *ctx, char *file)
     BIO_free(bio);
     if ( SSL_CTX_set_tmp_dh(ctx, ret) < 0 )         //TODO What does this do?
     {
-        ssl_print_error("Couldn't set DH parameters");
+        ssl_print_error("Couldn't set DH parameters\n");
         return -1;
     }
 
