@@ -162,6 +162,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
     return preverify_ok;
 }
 
+#define SERVER_LISTEN_PORT      8484
 #define DHFILE          "../keys/dh1024.pem"
 #define CA_LIST         "../keys/ca.crt"
 #define SERVER_CERT     "../keys/server_localhost.crt"
@@ -201,7 +202,7 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    listen_socket = tcp_listen(8484);
+    listen_socket = tcp_listen(SERVER_LISTEN_PORT);
     if (listen_socket < 0)
     {
         fprintf(stderr, "Server failed to listen on socket. Exiting.\n");
