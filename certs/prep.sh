@@ -11,4 +11,5 @@ mkdir root
 
 #TODO Only if file doesn't exist
 # touch intermediate/index.txt
+# touch intermediate/index.txt.attr
 # echo '00' > intermediate/serial.txt
