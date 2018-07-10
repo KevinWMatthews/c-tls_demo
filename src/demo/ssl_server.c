@@ -205,7 +205,7 @@ int main(void)
     if (listen_socket < 0)
     {
         fprintf(stderr, "Server failed to listen on socket. Exiting.\n");
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     while (1)
@@ -218,7 +218,7 @@ int main(void)
     if ( close(listen_socket) < 0 )
     {
         perror("Server app failed to close socket on exit");
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     destroy_ssl_context(ctx);
