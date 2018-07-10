@@ -164,21 +164,27 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 
 #define SERVER_LISTEN_PORT      8484
 #define DHFILE          "../keys/dh1024.pem"
-#define CA_LIST         "../keys/ca.crt"
+// #define CA_LIST         "../keys/ca.crt"
+
+// #define SERVER_CERT     "../server_chain.crt"
+// #define SERVER_CERT     "../server_chain_short.crt"
+// #define SERVER_CERT     "../keys/intermediate_ca.crt"
+// #define SERVER_KEY      "../keys/intermediate_ca.key"
+// #define SERVER_CERT     "../keys/server_intermediate_localhost.crt"
+// #define SERVER_KEY      "../keys/server_intermediate_localhost.key"
 #define SERVER_CERT     "../keys/server_localhost.crt"
 #define SERVER_KEY      "../keys/server_localhost.key"
 // #define SERVER_CERT     "../keys/server_ip.crt"
 // #define SERVER_KEY      "../keys/server_ip.key"
-// #define CLIENT_CERT     "../keys/server_asterisk34.crt"
-// #define CLIENT_KEY      "../keys/server_asterisk34.key"
+
 int main(void)
 {
     SSL_CTX *ctx = NULL;
     int listen_socket = SOCKETFD_INVALID;
 
     initialize_ssl_library();
-    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
-    // ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
+    // ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
+    ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -196,11 +202,11 @@ int main(void)
     }
 
     // Load CA list for doing client-side authentication
-    if ( load_ca_list(ctx, CA_LIST) < 0 )
-    {
-        destroy_ssl_context(ctx);
-        exit(EXIT_FAILURE);
-    }
+    // if ( load_ca_list(ctx, CA_LIST) < 0 )
+    // {
+        // destroy_ssl_context(ctx);
+        // exit(EXIT_FAILURE);
+    // }
 
     listen_socket = tcp_listen(SERVER_LISTEN_PORT);
     if (listen_socket < 0)

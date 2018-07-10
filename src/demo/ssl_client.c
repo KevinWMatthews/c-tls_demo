@@ -151,11 +151,15 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define HOST            "localhost"
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
+
 #define CA_LIST         "../keys/ca.crt"
+// #define CA_LIST         "../keys/intermediate_ca.crt"
+// #define CA_LIST         "../ca_chain.crt"
+
 // #define CLIENT_CERT     "../keys/client_ip.crt"
 // #define CLIENT_KEY      "../keys/client_ip.key"
-#define CLIENT_CERT     "../keys/client_localhost.crt"
-#define CLIENT_KEY      "../keys/client_localhost.key"
+// #define CLIENT_CERT     "../keys/client_localhost.crt"
+// #define CLIENT_KEY      "../keys/client_localhost.key"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
@@ -176,11 +180,11 @@ int main(void)
     }
 
     // Load certificate and key for when server does client-side authentication
-    if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
-    {
-        destroy_ssl_context(ctx);
-        exit(EXIT_FAILURE);
-    }
+    // if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
+    // {
+        // destroy_ssl_context(ctx);
+        // exit(EXIT_FAILURE);
+    // }
 
     socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
