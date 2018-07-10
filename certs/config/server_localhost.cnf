@@ -1,0 +1,47 @@
+# Config file for device with name of localhost
+
+[ req ]
+default_bits        = 4096
+default_md          = sha1
+string_mask         = utf8only
+distinguished_name  = req_distinguished_name
+# req_extensions      = req_ext
+prompt              = no
+
+[ req_distinguished_name ]
+# If prompt = no, specify values for Distinguished Name
+countryName             = "US"                      # C
+stateOrProvinceName     = "California"              # ST
+localityName            = "Monterey"                # L
+# The same organization can not have two CRT's from the same CSR.
+# To generate a second CRT, either generate a new CSR or change the organizationName.
+organizationName        = "CyberData Corporation"   # O
+organizationalUnitName  = "Server"                  # ON
+commonName              = "localhost"               # CN
+
+# emailAddress =
+# name
+# surname
+# givenName
+# initials ?
+# dnQualifier
+
+# If prompt = yes, you may override the prompts for Distinguished Name
+# countryName             = "Enter a two-letter Country Name"
+# countryName_min         = 2
+# # countryName_max is always 2
+# stateOrProvinceName     = "Enter a full US State name"
+# stateOrProvinceName_min = 2                         # Weird, you can still leave it blank
+# localityName            = "Enter a city name"
+# organizationName        = "Enter your company name (min 1, max 42)"
+# organizationName_min    = 1
+# organizationName_max    = 42
+
+[ req_ext ]
+# subjectAltName = @alt_names
+
+# This looks awesome
+[alt_names]
+# DNS.1	= [Fully Qualified Domain Name]
+# DNS.2	= [Any variation of FQDN]
+# DNS.3	= [Any variation of FQDN]
