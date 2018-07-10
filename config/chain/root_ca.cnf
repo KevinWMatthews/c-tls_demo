@@ -1,15 +1,64 @@
+[ ca ]
+# See https://www.openssl.org/docs/manmaster/man1/ca.html
+
+default_ca = CA_default
+
+[ CA_default ]
+
+dir             = ./certs/chain
+serial          = $dir/serial.txt                   # Must be present and contain a valid serial number in hex.
+database        = $dir/index.txt                    # File must be present.
+new_certs_dir   = $dir/newcerts                     # Override with -outdir
+certificate     = $dir/root_ca.crt                  # Override with -cert
+private_key     = $dir/root_ca_key.pem              # Override with -keyfile
+default_days    = 1000
+default_md      = sha1                              # sha1 is deprecated...
+preserve        = no
+email_in_dn     = no
+policy          = policy_match
+
+# Certificate detail format when asking user to confirm signing.
+# Defaults to old style, which is not recommended.
+#TODO experimetn with this when details aren't suppressed/certs aren't generated automatically.
+name_opt        = ca_default
+cert_opt        = ca_default
+
+
+# RANDFILE        =
+
+# Certificate Revocation List
+# crt                 =
+# crl_dir             =
+# crt_extensions      = crt_ext
+# default_crt_days    = 30
+# certs           =     ?
+
+# [ crt_ext ]
+# authorityKeyIdentifier  =   keyid:always
+
+# Only sign certificates that match. Designed for the root CA.
+[ policy_match ]
+countryName             = match         # must match the CA
+stateOrProvinceName     = match         # must match the CA
+organizationName        = match         # must match the CA
+organizationalUnitName  = optional      # will be saved but isn't required
+commonName              = supplied      # required
+emailAddress            = optional      # will be saved but isn't required
+
+
+# Options for the 'req' tool.
 # See https://www.openssl.org/docs/manmaster/man1/req.html, section "CONFIGURATION FILE FORMAT"
 # See also http://apfelboymchen.net/gnu/notes/openssl%20multidomain%20with%20config%20files.html
 [ req ]
 # input_password =                                    # Password for input private key file, if present. Override with -passin
 # output_password =                                   # Password for output private key, if created. Override with -passout
-default_keyfile = keys/default.key                  # Default filename for private key, if created. Override with -keyout
-default_md = sha1                                   # Default encryption digest algorithm. Override using ?
-default_bits = 4096                                 # If used with -new, specify number of bits in key. Override with -newkey
-string_mask = utf8only                              # Permit only these characters
-distinguished_name = req_distinguished_name         # Specify config file section for Distinguished Name.
-prompt = no                                         # Read config file for Distinguished Name. Do not prompt user.
-req_extensions = req_ext                            # Specify config file section that extends the certificate request. Override with -reqexts
+default_keyfile         = keys/root_ca_key.pem      # Default filename for private key, if created. Override with -keyout
+default_md              = sha1                      # Default encryption digest algorithm. Override using ?
+default_bits            = 4096                      # If used with -new, specify number of bits in key. Override with -newkey
+string_mask             = utf8only                  # Permit only these characters
+distinguished_name      = req_distinguished_name    # Specify config file section for Distinguished Name.
+prompt                  = no                        # Read config file for Distinguished Name. Do not prompt user.
+req_extensions          = req_ext_root_ca           # Specify config file section that extends the certificate request. Override with -reqexts
 # x509_extensions = x509_ext                          # Specify config file section that extends x509 certificates. Override with -extensions
 
 [ req_distinguished_name ]
@@ -18,7 +67,7 @@ countryName             = "US"                      # C
 stateOrProvinceName     = "California"              # ST
 localityName            = "Monterey"                # L
 organizationName        = "CyberData Corporation"   # O
-organizationalUnitName  = "CyberData CA"            # ON
+organizationalUnitName  = "CyberData Root CA"       # ON
 commonName              = "CyberData"               # CN
 # emailAddress =
 # name
@@ -38,10 +87,10 @@ commonName              = "CyberData"               # CN
 # organizationName_min    = 1
 # organizationName_max    = 42
 
-[ req_ext ]
+[ req_ext_root_ca ]
 # See https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 # format:
-#   extension_name=[critical,] extensino_options
+#   extension_name=[critical,] extension_options
 # Add prefix critical if the extension is critical (what does that mean?)
 
 # Is the certificate a CA certificate? CA:[TRUE/FALSE]
@@ -50,11 +99,25 @@ commonName              = "CyberData"               # CN
 # option: pathlen
 #   Specify number of certificates that can be below this in the chain
 #   (CA with 0 pathlen can only sign end-user certificates; not further CAs)
-basicConstraints = CA:TRUE
+basicConstraints = critical, CA:TRUE
+# Specify allowed operations for the private key
+# Allowed usasges:
+#   digitalSignature
+#   nonRepudiation
+#   keyEncipherment
+#   dataEncipherment
+#   keyAgreement
+#   keyCertSign
+#   cRLSign
+#   encipherOnly
+#   decipherOnly
+keyUsage                = critical, digitalSignature, keyCertSign
+# Specify allowed operations for the certificate public key
+extendedKeyUsage        =
 # keyUsage =
 # extendedKeyUsage =
 subjectKeyIdentifier = hash     # Do this?
 # keyid     copy subject from parent certificate
 # issuer    copy issuer and serial number from issuer certificate
-authorityKeyIdentifier = keyid:always,issuer:always
+authorityKeyIdentifier = keyid:always,issuer
 # ...
