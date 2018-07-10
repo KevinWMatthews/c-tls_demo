@@ -77,7 +77,7 @@ static int connect_to_socket(struct addrinfo *addr_list)
 
     if (addr == NULL)
     {
-        print_error("Could not connect to socket\n");
+        fprintf(stderr, "Could not connect to socket\n");
         return SOCKETFD_INVALID;
     }
     return socket_fd;
