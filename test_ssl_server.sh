@@ -42,10 +42,6 @@ usage ()
 
     # -CAfile /tftpboot/cert_vonage.pem \
     # -CApath /etc/ssl/certs
-openssl s_client \
-    -connect sip-785500b.accounts.qa7.vocal-qa.com:10002 \
-    -CAfile /usr/share/ca-certificates/mozilla/DigiCert_Global_Root_CA.crt \
-    -state
 
 # openssl s_client \
     # -connect 10.0.1.34:5061 \
@@ -53,3 +49,20 @@ openssl s_client \
     # -key keys/client.key \
     # -cert keys/client.crt \
     # -state
+
+echo 'command'
+COMMAND="openssl s_client \
+    -connect sip-785500b.accounts.qa7.vocal-qa.com:10002 \
+    -CAfile /usr/share/ca-certificates/mozilla/DigiCert_Global_Root_CA.crt \
+    -verify_hostname __sip-785500b.accounts.qa7.vocal-qa.com \
+    -verify_return_error -quiet"
+OUTPUT=$( ${COMMAND} 2>&1 )
+
+echo '1'
+echo $OUTPUT
+echo '2'
+if printf "%s" "$OUTPUT" | grep 'verify error'; then
+    exit 1
+else
+    exit 0
+fi
