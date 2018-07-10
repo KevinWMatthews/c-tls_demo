@@ -107,12 +107,6 @@ int tcp_connect(const char *host, const char *port)
 
 int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
-    if (preverify_ok == 0)
-    {
-        fprintf(stderr, "OpenSSL rejected certificate\n");
-        fprintf(stderr, "TODO print error details\n");
-        return preverify_ok;
-    }
 
     X509 * cert = X509_STORE_CTX_get_current_cert(x509_ctx);
     if (!cert)
@@ -132,11 +126,25 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
     cdssl_print_x509_name(name);
 
     char peer_cn[64] = {0};
+    //TODO extract this?
     X509_NAME_get_text_by_NID(name, NID_commonName, peer_cn, sizeof(peer_cn));
 
     fprintf(stderr, "Common Name: %s\n", peer_cn);
 
     fprintf(stderr, "Cert verification result: %d\n", preverify_ok);
+
+    if (preverify_ok == 0)
+    {
+        int err = 0;
+        const char *err_string = NULL;
+
+        //TODO Extract this?
+        err = X509_STORE_CTX_get_error(x509_ctx);
+        err_string = X509_verify_cert_error_string(err);
+
+        fprintf(stderr, "OpenSSL rejected certificate: (%d) %s\n", err, err_string);
+        return preverify_ok;
+    }
     return preverify_ok;
 }
 
