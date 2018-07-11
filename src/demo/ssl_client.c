@@ -107,7 +107,6 @@ int tcp_connect(const char *host, const char *port)
 
 int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
-
     X509 * cert = X509_STORE_CTX_get_current_cert(x509_ctx);
     if (!cert)
     {
@@ -152,7 +151,9 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
 
-#define CA_LIST         "../keys/ca.crt"
+// #define CA_LIST         "../certs/root/root_ca_cert.pem"
+// #define CA_LIST         "../certs/intermediate/intermediate_ca_cert.pem"
+#define CA_LIST         "../certs/intermediate/ca_chain_cert.pem"
 // #define CA_LIST         "../keys/intermediate_ca.crt"
 // #define CA_LIST         "../ca_chain.crt"
 
