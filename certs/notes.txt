@@ -1,0 +1,22 @@
+$ mkdir root_ca
+$ vim root_ca/root_ca.cnf
+
+
+# Create key for root CA
+# Can be generated with the root CA cert
+$ openssl genrsa \
+    -aes256 \
+    -out root_ca/ca.key.pem \
+    4096
+password
+
+# Create cert for root CA
+# Prints to stdout by default, so specify -out
+# -x509 generates a crt instead of a csr
+# -new generates a new request
+# -batch for non-interactive
+$ openssl req \
+    -new \
+    -x509 \
+    -config root_ca/root_ca.cnf \
+    -out root_ca/ca.cert.pem
