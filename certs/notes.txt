@@ -20,3 +20,9 @@ $ openssl req \
     -x509 \
     -config root_ca/root_ca.cnf \
     -out root_ca/ca.cert.pem
+
+
+$ mkdir intermediate_ca
+$ touch intermediate_ca/index.txt
+$ echo '00' > intermediate_ca/serial.txt
+$ vim intermediate_ca/ca.cnf
