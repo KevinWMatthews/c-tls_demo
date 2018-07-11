@@ -151,9 +151,10 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
 
+#define CA_LIST         "../certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"
 // #define CA_LIST         "../certs/root/root_ca_cert.pem"
 // #define CA_LIST         "../certs/intermediate/intermediate_ca_cert.pem"
-#define CA_LIST         "../certs/intermediate/ca_chain_cert.pem"
+// #define CA_LIST         "../certs/intermediate/ca_chain_cert.pem"
 // #define CA_LIST         "../keys/intermediate_ca.crt"
 // #define CA_LIST         "../ca_chain.crt"
 

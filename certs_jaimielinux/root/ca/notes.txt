@@ -1,0 +1,69 @@
+$ openssl genrsa -aes256 -out private/ca.key.pem 4096
+password: password
+$ chmod 400 private/ca.key.pem
+$ openssl req -config openssl.cnf \
+      -key private/ca.key.pem \
+      -new -x509 -days 7300 -sha256 -extensions v3_ca \
+      -out certs/ca.cert.pem
+ON: Alice Ltd
+OUN: Alice Ltd Certificate Authority
+CN: Alice Ltd Root CA
+$ chmod 444 certs/ca.cert.pem
+$ openssl x509 -noout -text -in certs/ca.cert.pem
+
+
+$ mkdir intermediate
+$ cd intermediate
+$ mkdir certs crl csr newcerts private
+$ chmod 700 private
+$ touch index.txt
+$ echo 1000 > serial
+$ echo 1000 > crlnumber
+
+Copy .cnf file
+$ cd ..
+$ openssl genrsa -aes256 \
+      -out intermediate/private/intermediate.key.pem 4096
+password: password
+
+$ openssl req -config intermediate/openssl.cnf -new -sha256 \
+      -key intermediate/private/intermediate.key.pem \
+      -out intermediate/csr/intermediate.csr.pem
+Alice Ltd
+Alice Ltd Certificate Authority
+Alice Ltd Intermediate CA
+
+# I still think the config thing is a bug? Or it is unnecessary.
+$ openssl ca -config openssl.cnf -extensions v3_intermediate_ca \
+      -days 3650 -notext -md sha256 \
+      -in intermediate/csr/intermediate.csr.pem \
+      -out intermediate/certs/intermediate.cert.pem
+
+# Verify cert
+$ openssl x509 -noout -text \
+      -in intermediate/certs/intermediate.cert.pem
+# Verify chain
+$ openssl verify -CAfile certs/ca.cert.pem \
+      intermediate/certs/intermediate.cert.pem
+$ cat intermediate/certs/intermediate.cert.pem \
+      certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem
+
+
+# Server cert
+# Leave off -aes256 to omit password
+$ openssl genrsa -aes256 \
+      -out intermediate/private/www.example.com.key.pem 2048
+password
+
+$ openssl req -config intermediate/openssl.cnf \
+      -key intermediate/private/www.example.com.key.pem \
+      -new -sha256 -out intermediate/csr/www.example.com.csr.pem
+Alice Ltd Web Services
+www.example.com
+### Do we really use intermediate.cnf??
+$ openssl ca -config intermediate/openssl.cnf \
+      -extensions server_cert -days 375 -notext -md sha256 \
+      -in intermediate/csr/www.example.com.csr.pem \
+      -out intermediate/certs/www.example.com.cert.pem
+$ openssl x509 -noout -text \
+      -in intermediate/certs/www.example.com.cert.pem

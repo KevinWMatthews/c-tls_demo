@@ -166,8 +166,10 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define DHFILE          "../keys/dh1024.pem"
 // #define CA_LIST         "../keys/ca.crt"
 
-#define SERVER_CERT     "../certs/intermediate/server_localhost_cert.pem"
-#define SERVER_KEY      "../certs/intermediate/server_localhost_key.pem"
+#define SERVER_CERT     "../certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
+#define SERVER_KEY      "../certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
+// #define SERVER_CERT     "../certs/intermediate/server_localhost_cert.pem"
+// #define SERVER_KEY      "../certs/intermediate/server_localhost_key.pem"
 // #define SERVER_CERT     "../server_chain.crt"
 // #define SERVER_CERT     "../server_chain_short.crt"
 // #define SERVER_CERT     "../keys/intermediate_ca.crt"
