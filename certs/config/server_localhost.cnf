@@ -6,6 +6,7 @@ default_md          = sha1
 string_mask         = utf8only
 distinguished_name  = req_distinguished_name
 # req_extensions      = req_ext
+x509_extensions     = server_cert
 prompt              = no
 
 [ req_distinguished_name ]
@@ -46,11 +47,17 @@ commonName              = "localhost"               # CN
 # DNS.2	= [Any variation of FQDN]
 # DNS.3	= [Any variation of FQDN]
 
+[ server_cert ]
+basicConstraints        = critical, CA:FALSE
+keyUsage                = critical, nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage        = clientAuth
+subjectKeyIdentifier    = hash
+nsCertType              = server
+authorityKeyIdentifier  = keyid:always,issuer
 
-## It throws an error if I don't include this.
+# It throws an error if I don't include this.
 [ ca ]
-## See https://www.openssl.org/docs/manmaster/man1/ca.html
-#
+# See https://www.openssl.org/docs/manmaster/man1/ca.html
 default_ca = CA_default
 
 [ CA_default ]

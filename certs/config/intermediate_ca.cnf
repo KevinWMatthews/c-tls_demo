@@ -61,14 +61,14 @@ emailAddress            = optional      # will be saved but isn't required
 [ req ]
 # input_password =                                      # Password for input private key file, if present. Override with -passin
 # output_password =                                     # Password for output private key, if created. Override with -passout
-default_keyfile         = $dir/intermediate_ca_key.pem      # Default filename for private key, if created. Override with -keyout
+default_keyfile         = ./intermediate/intermediate_ca_key.pem      # Default filename for private key, if created. Override with -keyout
 default_md              = sha1                          # Default encryption digest algorithm. Override using ?
 default_bits            = 4096                          # If used with -new, specify number of bits in key. Override with -newkey
 string_mask             = utf8only                      # Permit only these characters
 distinguished_name      = req_distinguished_name        # Specify config file section for Distinguished Name.
 prompt                  = no                            # Read config file for Distinguished Name. Do not prompt user.
-req_extensions          = req_ext_intermediate_ca       # Specify config file section that extends the certificate request. Override with -reqexts
-# x509_extensions = x509_ext                          # Specify config file section that extends x509 certificates. Override with -extensions
+# req_extensions          = req_ext_intermediate_ca       # Specify config file section that extends the certificate request. Override with -reqexts
+x509_extensions = v3_intermediate_ca                          # Specify config file section that extends x509 certificates. Override with -extensions
 
 [ req_distinguished_name ]
 # If prompt = no, specify values for Distinguished Name
@@ -96,7 +96,7 @@ commonName              = "CyberData"                   # CN
 # organizationName_min    = 1
 # organizationName_max    = 42
 
-[ req_ext_intermediate_ca ]
+[ v3_intermediate_ca ]
 # See https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 
 basicConstraints = critical, CA:TRUE
