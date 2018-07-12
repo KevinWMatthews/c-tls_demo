@@ -1,0 +1,14 @@
+version: '3.2'
+services:
+  dev:
+    build: .
+    volumes:
+      - type: bind
+        source: .
+        target: /home/tls_demo
+      - type: bind
+        source: ../build_docker_tls_demo
+        target: /home/build_tls_demo
+
+#TODO how do I prevent the container from exiting immediately?
+#I want it to run in the background with --interactive
