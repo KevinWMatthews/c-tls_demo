@@ -163,23 +163,23 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 }
 
 #define SERVER_LISTEN_PORT      8484
-#define DHFILE          "../keys/dh1024.pem"
-// #define CA_LIST         "../keys/ca.crt"
+#define DHFILE          "../tls_demo/keys/dh1024.pem"
+// #define CA_LIST         "../tls_demo/keys/ca.crt"
 
-// #define SERVER_CERT     "../certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
-// #define SERVER_KEY      "../certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
-// #define SERVER_CERT     "../certs/intermediate/server_localhost_cert.pem"
-// #define SERVER_KEY      "../certs/intermediate/server_localhost_key.pem"
-// #define SERVER_CERT     "../server_chain.crt"
-// #define SERVER_CERT     "../server_chain_short.crt"
-// #define SERVER_CERT     "../keys/intermediate_ca.crt"
-// #define SERVER_KEY      "../keys/intermediate_ca.key"
-// #define SERVER_CERT     "../keys/server_intermediate_localhost.crt"
-// #define SERVER_KEY      "../keys/server_intermediate_localhost.key"
-#define SERVER_CERT     "../keys/server_localhost.crt"
-#define SERVER_KEY      "../keys/server_localhost.key"
-// #define SERVER_CERT     "../keys/server_ip.crt"
-// #define SERVER_KEY      "../keys/server_ip.key"
+// #define SERVER_CERT     "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
+// #define SERVER_KEY      "../tls_demo/certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
+// #define SERVER_CERT     "../tls_demo/certs/intermediate/server_localhost_cert.pem"
+// #define SERVER_KEY      "../tls_demo/certs/intermediate/server_localhost_key.pem"
+// #define SERVER_CERT     "../tls_demo/server_chain.crt"
+// #define SERVER_CERT     "../tls_demo/server_chain_short.crt"
+// #define SERVER_CERT     "../tls_demo/keys/intermediate_ca.crt"
+// #define SERVER_KEY      "../tls_demo/keys/intermediate_ca.key"
+// #define SERVER_CERT     "../tls_demo/keys/server_intermediate_localhost.crt"
+// #define SERVER_KEY      "../tls_demo/keys/server_intermediate_localhost.key"
+#define SERVER_CERT     "../tls_demo/keys/server_localhost.crt"
+#define SERVER_KEY      "../tls_demo/keys/server_localhost.key"
+// #define SERVER_CERT     "../tls_demo/keys/server_ip.crt"
+// #define SERVER_KEY      "../tls_demo/keys/server_ip.key"
 
 int main(void)
 {

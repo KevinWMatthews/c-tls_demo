@@ -151,18 +151,18 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
 
-// #define CA_LIST         "../certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"
-// #define CA_LIST         "../certs/root/root_ca_cert.pem"
-// #define CA_LIST         "../certs/intermediate/intermediate_ca_cert.pem"
-// #define CA_LIST         "../certs/intermediate/ca_chain_cert.pem"
-// #define CA_LIST         "../keys/intermediate_ca.crt"
-// #define CA_LIST         "../ca_chain.crt"
-#define CA_LIST         "../keys/ca.crt"
+// #define CA_LIST         "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"
+// #define CA_LIST         "../tls_demo/certs/root/root_ca_cert.pem"
+// #define CA_LIST         "../tls_demo/certs/intermediate/intermediate_ca_cert.pem"
+// #define CA_LIST         "../tls_demo/certs/intermediate/ca_chain_cert.pem"
+// #define CA_LIST         "../tls_demo/keys/intermediate_ca.crt"
+// #define CA_LIST         "../tls_demo/ca_chain.crt"
+#define CA_LIST         "../tls_demo/keys/ca.crt"
 
-// #define CLIENT_CERT     "../keys/client_ip.crt"
-// #define CLIENT_KEY      "../keys/client_ip.key"
-// #define CLIENT_CERT     "../keys/client_localhost.crt"
-// #define CLIENT_KEY      "../keys/client_localhost.key"
+// #define CLIENT_CERT     "../tls_demo/keys/client_ip.crt"
+// #define CLIENT_KEY      "../tls_demo/keys/client_ip.key"
+// #define CLIENT_CERT     "../tls_demo/keys/client_localhost.crt"
+// #define CLIENT_KEY      "../tls_demo/keys/client_localhost.key"
 int main(void)
 {
     int socket_fd = SOCKETFD_INVALID;
