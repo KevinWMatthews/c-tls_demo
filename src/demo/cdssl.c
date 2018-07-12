@@ -248,7 +248,7 @@ int ssl_accept(SSL *ssl)
     ret = SSL_accept(ssl);
     if ( ret <= 0 )
     {
-        fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
+        print_error("Failed to complete TLS handshake\n");
     }
     return ret;
 }
@@ -410,7 +410,7 @@ int load_dh_params(SSL_CTX *ctx, char *file)
 
     if ( bio == NULL)
     {
-        print_error("Couldn't open DH file");
+        print_error("Couldn't open DH file\n");
         return -1;
     }
 
