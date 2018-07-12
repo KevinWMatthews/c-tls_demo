@@ -151,12 +151,13 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define HOST            "10.0.1.34"
 #define PORT            "8484"
 
-#define CA_LIST         "../certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"
+// #define CA_LIST         "../certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"
 // #define CA_LIST         "../certs/root/root_ca_cert.pem"
 // #define CA_LIST         "../certs/intermediate/intermediate_ca_cert.pem"
 // #define CA_LIST         "../certs/intermediate/ca_chain_cert.pem"
 // #define CA_LIST         "../keys/intermediate_ca.crt"
 // #define CA_LIST         "../ca_chain.crt"
+#define CA_LIST         "../keys/ca.crt"
 
 // #define CLIENT_CERT     "../keys/client_ip.crt"
 // #define CLIENT_KEY      "../keys/client_ip.key"
@@ -173,6 +174,15 @@ int main(void)
     ctx = initialize_ssl_context(SSL_VERIFY_PEER, verify_callback);
     if (ctx == NULL)
         exit(EXIT_FAILURE);
+
+    long options = 0;
+    options |= SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |  SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2;
+    if ( cdssl_set_ssl_context_options(ctx, options) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
+
 
     // Load CA list for doing server-side authentication
     if ( load_ca_list(ctx, CA_LIST) < 0 )

@@ -11,7 +11,7 @@ static BIO *bio_err;
  *
  * Use for printing errors that occur in user code.
  */
-//TODO add varargs?
+//TODO add varargs!
 void print_error(char *string)
 {
     // Print user's string to BIO file handle
@@ -47,7 +47,9 @@ void initialize_ssl_library(void)
     bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);      // I don't know if/how to free this.
 
     //TODO add varargs support to local print() functions
-    fprintf(stderr, "%s\n", OpenSSL_version(OPENSSL_VERSION));
+    const char *version = NULL;
+    version = SSLeay_version(SSLEAY_VERSION);
+    fprintf(stderr, "%s\n", version);
 }
 
 SSL_CTX *initialize_ssl_context(int verify_options, int (*verify_callback)(int, X509_STORE_CTX *))
@@ -155,6 +157,7 @@ void destroy_ssl_connection(SSL *ssl)
 
 int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int flags)
 {
+#ifdef OPENSSL_V1_1_0
     // Taken from https://wiki.openssl.org/index.php/Hostname_validation
     //
     // There may be bugs:
@@ -163,7 +166,7 @@ int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int fla
     //      https://groups.google.com/forum/#!topic/mailing.openssl.dev/YcJX0njO1oo
     // See also https://tools.ietf.org/html/rfc6125
 
-    //NOTE this implementation is specific to ssl 1.0.0
+    //NOTE this implementation is specific to ssl 1.1.0
     // https://www.openssl.org/docs/man1.1.0/ssl/SSL_set_hostflags.html
 
     /*
@@ -196,6 +199,7 @@ int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int fla
         ssl_print_error("Failed to set hostname for common name validation\n");
         return -1;
     }
+#endif
 
     //TODO implement for OpenSSL v1.0.2
     // https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_set1_host.html
@@ -247,6 +251,36 @@ int ssl_accept(SSL *ssl)
         fprintf(stderr, "%s: Failed to complete TLS handshake\n", __func__);
     }
     return ret;
+}
+
+int cdssl_set_ssl_context_options(SSL_CTX *ctx, long options)
+{
+    long new_options = 0;
+
+    if (ctx == NULL)
+    {
+        print_error("Passed a null SSL context\n");
+        return -1;
+    }
+
+    /*
+     * long SSL_CTX_set_options(SSL_CTX *ctx, long options)
+     *
+     * Adds the options set via bitmask in options to ctx.
+     * Options already set before are not cleared!
+     *
+     * Returns the new options bitmask.
+     */
+    new_options = SSL_CTX_set_options(ctx, options);
+    if ( !(new_options & options) )
+    {
+        char msg[128] = {0};
+        snprintf(msg, sizeof(msg), "Error setting options: tried to set 0x%08lx but actually set 0x%08lx\n", options, new_options);
+        print_error(msg);
+        return -1;
+    }
+
+    return 0;
 }
 
 void destroy_ssl_context(SSL_CTX *ctx)

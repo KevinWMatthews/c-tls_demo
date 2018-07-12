@@ -63,6 +63,17 @@ void cdssl_print_x509_name(X509_NAME *name);
 void destroy_ssl_context(SSL_CTX *ctx);
 
 /*
+ * Set options for the entire SSL context.
+ *
+ * Options for individual SSL connections can be set elsewhere.
+ * For a list of options, see https://www.openssl.org/docs/man1.0.2/ssl/SSL_CTX_set_options.html
+ * or <openssl/ssl.h>
+ *
+ * Returns 0 on success and -1 on failure.
+ */
+int cdssl_set_ssl_context_options(SSL_CTX *ctx, long options);
+
+/*
  * Create handle for an individual SSL connection.
  *
  * The SSL connection/TLS handshake takes place over the provided TCP connection

@@ -166,8 +166,8 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define DHFILE          "../keys/dh1024.pem"
 // #define CA_LIST         "../keys/ca.crt"
 
-#define SERVER_CERT     "../certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
-#define SERVER_KEY      "../certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
+// #define SERVER_CERT     "../certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
+// #define SERVER_KEY      "../certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
 // #define SERVER_CERT     "../certs/intermediate/server_localhost_cert.pem"
 // #define SERVER_KEY      "../certs/intermediate/server_localhost_key.pem"
 // #define SERVER_CERT     "../server_chain.crt"
@@ -176,8 +176,8 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define SERVER_KEY      "../keys/intermediate_ca.key"
 // #define SERVER_CERT     "../keys/server_intermediate_localhost.crt"
 // #define SERVER_KEY      "../keys/server_intermediate_localhost.key"
-// #define SERVER_CERT     "../keys/server_localhost.crt"
-// #define SERVER_KEY      "../keys/server_localhost.key"
+#define SERVER_CERT     "../keys/server_localhost.crt"
+#define SERVER_KEY      "../keys/server_localhost.key"
 // #define SERVER_CERT     "../keys/server_ip.crt"
 // #define SERVER_KEY      "../keys/server_ip.key"
 
@@ -191,6 +191,14 @@ int main(void)
     ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
+
+    long options = 0;
+    options |= SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_2;
+    if ( cdssl_set_ssl_context_options(ctx, options) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     if ( load_dh_params(ctx, DHFILE) < 0 )
     {
