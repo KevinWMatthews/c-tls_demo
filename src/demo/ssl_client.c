@@ -176,7 +176,7 @@ int main(void)
         exit(EXIT_FAILURE);
 
     long options = 0;
-    options |= SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |  SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2;
+    options |= SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3;
     if ( cdssl_set_ssl_context_options(ctx, options) < 0 )
     {
         destroy_ssl_context(ctx);

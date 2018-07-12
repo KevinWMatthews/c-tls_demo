@@ -223,9 +223,13 @@ int ssl_connect(SSL *ssl)
      *      < 0 on error
      */
     ret = SSL_connect(ssl);
-    if ( ret <= 0 )
+    if ( ret == 0 )
     {
-        ssl_print_error("Failed to complete TLS handshake\n");
+        ssl_print_error("TLS connection rejected\n");
+    }
+    if ( ret < 0 )
+    {
+        ssl_print_error("TLS connection failed\n");
     }
     return ret;
 }
