@@ -50,8 +50,8 @@ password
 $ openssl req \
     -new \
     -config intermediate_ca/intermediate_ca.cnf \
-      -key intermediate_ca/intermediate.key.pem \
-      -out intermediate_ca/intermediate.csr.pem
+    -key intermediate_ca/intermediate.key.pem \
+    -out intermediate_ca/intermediate.csr.pem
 
 $ touch root_ca/index.txt
 $ touch root_ca/index.txt.attr
@@ -99,3 +99,10 @@ $ openssl genrsa \
     -out intermediate_ca/localhost.key.pem \
     2048
 password
+
+# Generate server csr
+$ openssl req \
+    -new \
+    -config intermediate_ca/intermediate_ca.cnf \
+    -key intermediate_ca/intermediate.key.pem \
+    -out intermediate_ca/localhost.csr.pem
