@@ -101,7 +101,7 @@ $ openssl verify \
     intermediate_ca/intermediate_ca.crt.pem
 
 # Create intermediate cert chain
-$ cat intermediate_ca/intermediate.cert.pem root_ca/ca.cert.pem > intermediate_ca/ca-chain.cert.pem
+$ cat intermediate_ca/intermediate_ca.crt.pem root_ca/root_ca.crt.pem > intermediate_ca/ca-chain.cert.pem
 
 
 # Prepare intermediate cert for signing other CSR's
@@ -117,7 +117,20 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/localhost_server.key.pem \
     2048
-localhost
+localhost_server
+
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in intermediate_ca/localhost_server.key.pem
+
+# Verify csr
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/localhost_server.csr.pem
 
 # Generate server csr
 $ openssl req \
