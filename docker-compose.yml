@@ -9,6 +9,10 @@ services:
       - type: bind
         source: ../build_docker_tls_demo
         target: /home/build_tls_demo
+    # stdin_open: true      # Same as --interactive
 
-#TODO how do I prevent the container from exiting immediately?
-#I want it to run in the background with --interactive
+    # Bash ignores SIGTERM, which Docker uses by default to terminate containers.
+    # Bash will exit by default on SIGHUP - terminal hangup - so attach a TTY and hangup to stop containers.
+    # Alternatively, you could run a bash script and configure a trap to exit on SIGTERM.
+    tty: true
+    stop_signal: SIGHUP
