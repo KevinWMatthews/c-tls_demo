@@ -59,8 +59,18 @@ $ vim intermediate_ca/intermediate_ca.cnf
 $ openssl req \
     -new \
     -config intermediate_ca/intermediate_ca.cnf \
+    -extensions v3_intermediate_ca \
     -key intermediate_ca/intermediate_ca.key.pem \
     -out intermediate_ca/intermediate_ca.csr.pem
+
+# Verify CSR
+# -noout    do not print csr hash
+# -text     print in human-readable form
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/intermediate_ca.csr.pem
 
 $ touch root_ca/index.txt
 $ touch root_ca/index.txt.attr
