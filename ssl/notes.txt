@@ -22,7 +22,7 @@ $ openssl rsa \
     -noout \
     -in root_ca/root_ca.key.pem
 
-# Create cert for root CA
+# Self-sign cert for root CA
 # Prints to stdout by default, so specify -out
 # -x509 generates a self-signed cert instead of a certificate signing request (-in is used to sign a csr)
 # -new generates a new request
@@ -32,14 +32,14 @@ $ openssl req \
     -new \
     -x509 \
     -config root_ca/root_ca.cnf \
-    -key root_ca/ca.key.pem \
-    -out root_ca/ca.cert.pem
+    -key root_ca/root_ca.key.pem \
+    -out root_ca/root_ca.crt.pem
 
 # Verify cert
 $ openssl x509 \
     -noout \
     -text \
-    -in root_ca/ca.cert.pem
+    -in root_ca/root_ca.crt.pem
 
 
 ### Intermediate CA
