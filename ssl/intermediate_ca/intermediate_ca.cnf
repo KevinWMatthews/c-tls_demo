@@ -59,19 +59,19 @@ keyUsage                = critical, digitalSignature, keyCertSign
 default_ca = CA_default
 
 [ CA_default ]
-dir                 = ./root_ca             # Convenience variable
-# certs               = certs                 # Not sure if/what this does
-new_certs_dir       = $(dir)/new_certs             # Directory for new certificates. Overridden by -outdir. Mandatory.
+dir                 = ./intermediate_ca                 # Convenience variable
+# certs               = certs                             # Not sure if/what this does
+new_certs_dir       = $(dir)/new_certs                  # Directory for new certificates. Overridden by -outdir. Mandatory.
 database            = $(dir)/index.txt
 serial              = $(dir)/serial.txt
-private_key         = $(dir)/ca.key.pem    # Private key of signing CA. Overridden by -keyfile. Mandatory.
-certificate         = $(dir)/ca.cert.pem   # Certificate of signing CA. Overridden by -cert. Mandatory.
+private_key         = $(dir)/intermediate.key.pem       # Private key of signing CA. Overridden by -keyfile. Mandatory.
+certificate         = $(dir)/intermediate.cert.pem      # Certificate of signing CA. Overridden by -cert. Mandatory.
 default_md          = sha256
-name_opt            = ca_default            # Recommended
+name_opt            = ca_default                        # Recommended
 cert_opt            = ca_default
 default_days        = 1000
 preserve            = no
-policy              = policy_strict
+policy              = policy_loose
 
 [ policy_loose ]
 # Allow the intermediate CA to sign a more diverse range of certificates.

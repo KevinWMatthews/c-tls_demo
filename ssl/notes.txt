@@ -88,6 +88,7 @@ $ cat intermediate_ca/intermediate.cert.pem root_ca/ca.cert.pem > intermediate_c
 # Prepare intermediate cert for signing other CSR's
 $ touch intermediate_ca/index.txt
 $ touch intermediate_ca/index.txt.attr
+$ mkdir intermediate_ca/new_certs
 $ echo '00' > intermediate_ca/serial.txt
 $ vim intermediate_ca/intermediate_ca.cnf
 
@@ -106,3 +107,28 @@ $ openssl req \
     -config intermediate_ca/localhost.cnf \
     -key intermediate_ca/localhost.key.pem \
     -out intermediate_ca/localhost.csr.pem
+
+# Sign server CSR with intermediate CA
+# The intermediate CA is doing the signing, so use its config file
+$ openssl ca \
+    -notext \
+    -config intermediate_ca/intermediate_ca.cnf \
+    -in intermediate_ca/localhost.csr.pem \
+    -out intermediate_ca/localhost.cert.pem
+
+# Verify cert
+$ openssl x509 \
+    -noout \
+    -text \
+    -in intermediate_ca/localhost.cert.pem
+
+# Verify cert chain
+$ openssl verify \
+    -CAfile intermediate_ca/intermediate.cert.pem \
+    intermediate_ca/localhost.cert.pem
+Should fail!
+
+$ openssl verify \
+    -CAfile intermediate_ca/ca-chain.cert.pem \
+    intermediate_ca/localhost.cert.pem
+Success
