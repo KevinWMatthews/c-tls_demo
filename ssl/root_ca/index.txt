@@ -1,1 +1,0 @@
-V	210408204748Z		00	unknown	/C=US/ST=California/O=CyberData Corporation/OU=CyberData Certificate Authority/CN=CyberData Intermediate CA
