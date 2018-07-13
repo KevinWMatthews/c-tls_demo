@@ -1,10 +1,10 @@
-# OpenSSL configuration file for root CA.
+# OpenSSL configuration file for intermediate CA.
 
 # Configuration for `openssl req`
 # See `man req` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 [ req ]
-dir                 = root_ca
-# default_keyfile     = $dir/ca.key.pem           # Name of generated private key. Overridden by -keyout
+dir                 = intermediate_ca
+default_keyfile     = $dir/ca.key.pem           # Name of generated private key. Overridden by -keyout
 default_bits        = 4096                      # If used with -new, specify number of bits in key. Override with -newkey
 distinguished_name  = req_distinguished_name    # Specify config file section for Distinguished Name.
 string_mask         = utf8only                  # Permit only these characters
@@ -21,7 +21,7 @@ stateOrProvinceName     = "California"                          # ST
 localityName            = "Monterey"                            # L
 organizationName        = "CyberData Corporation"               # O
 organizationalUnitName  = "CyberData Certificate Authority"     # ON
-commonName              = "CyberData Root CA"                   # CN
+commonName              = "CyberData Intermediate CA"           # CN
 # emailAddress =
 # name
 # surname
