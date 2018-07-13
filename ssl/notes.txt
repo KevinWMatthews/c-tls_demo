@@ -48,16 +48,17 @@ $ mkdir intermediate_ca
 # Generate key for intermediate CA
 $ openssl genrsa \
     -aes256 \
-    -out intermediate_ca/intermediate.key.pem \
+    -out intermediate_ca/intermediate_ca.key.pem \
     4096
-password
+intermediate_ca
 
 # Generate certificate signing request (CSR) for intermediate CA
+$ vim intermediate_ca/intermediate_ca.cnf
 $ openssl req \
     -new \
     -config intermediate_ca/intermediate_ca.cnf \
-    -key intermediate_ca/intermediate.key.pem \
-    -out intermediate_ca/intermediate.csr.pem
+    -key intermediate_ca/intermediate_ca.key.pem \
+    -out intermediate_ca/intermediate_ca.csr.pem
 
 $ touch root_ca/index.txt
 $ touch root_ca/index.txt.attr
@@ -96,7 +97,6 @@ $ touch intermediate_ca/index.txt
 $ touch intermediate_ca/index.txt.attr
 $ mkdir intermediate_ca/new_certs
 $ echo '00' > intermediate_ca/serial.txt
-$ vim intermediate_ca/intermediate_ca.cnf
 
 
 ### Generate server cert

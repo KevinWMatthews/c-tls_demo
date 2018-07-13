@@ -1,12 +1,15 @@
 # OpenSSL configuration file for root CA.
 
+#######
+# req
+#######
 # Configuration for `openssl req`
 # See `man req` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 [ req ]
 distinguished_name  = req_distinguished_name    # Specify config file section for Distinguished Name.
 string_mask         = utf8only                  # Permit only these characters
 default_md          = sha256                    # Override with -[digest]
-prompt = no                                     # Read config file for Distinguished Name. Do not prompt user.
+prompt              = no                        # Read config file for Distinguished Name. Do not prompt user.
 x509_extensions     = x509_extensions           # Extensions for when -x509 is used. Overriden by -extensions
 
 [ req_distinguished_name ]
@@ -35,35 +38,9 @@ commonName              = "CyberData Root CA"                   # CN
 # organizationName_min    = 1
 # organizationName_max    = 42
 
-# Default x509 extensions
-[ x509_extensions ]
-# Nothing - forcing the user to specify what they are signing
-
-# x509 extensions for a typical root CA
-# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
-[ v3_root_ca ]
-subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always,issuer
-# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
-basicConstraints        = critical, CA:true
-# Specify allowed operations for the private key
-keyUsage                = critical, digitalSignature, keyCertSign
-# Specify allowed operations for the certificate public key
-# extendedKeyUsage        =
-
-# x509 extensions for a typical intermediate CA
-# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
-[ v3_intermediate_ca ]
-subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always,issuer
-# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
-basicConstraints        = critical, CA:true, pathlen:0
-# Specify allowed operations for the private key
-keyUsage                = critical, digitalSignature, keyCertSign
-# Specify allowed operations for the certificate public key
-# extendedKeyUsage        =
-
-
+#######
+# ca
+#######
 # Configuration for `openssl ca`, which is used sign Certificate Signing Requests, which generates a certificate
 # Not needed to self-sign its own certificate but is needed to sign the CSR of an intermediate CA.
 # See `man ca`
@@ -94,3 +71,35 @@ organizationName        = match
 organizationalUnitName  = optional
 commonName              = supplied
 emailAddress            = optional
+
+
+#########
+# x509
+#########
+# Default x509 extensions
+[ x509_extensions ]
+# Nothing - forcing the user to specify what they are signing
+
+# x509 extensions for a typical root CA
+# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+[ v3_root_ca ]
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always,issuer
+# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
+basicConstraints        = critical, CA:true
+# Specify allowed operations for the private key
+keyUsage                = critical, digitalSignature, keyCertSign
+# Specify allowed operations for the certificate public key
+# extendedKeyUsage        =
+
+# x509 extensions for a typical intermediate CA
+# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+[ v3_intermediate_ca ]
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always,issuer
+# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
+basicConstraints        = critical, CA:true, pathlen:0
+# Specify allowed operations for the private key
+keyUsage                = critical, digitalSignature, keyCertSign
+# Specify allowed operations for the certificate public key
+# extendedKeyUsage        =

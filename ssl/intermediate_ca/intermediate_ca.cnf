@@ -1,0 +1,68 @@
+# OpenSSL configuration file for intermediate CA.
+
+
+### openssl req configuration
+[ req ]
+distinguished_name      = req_distinguished_name
+string_mask             = utf8only
+default_md              = sha256
+prompt                  = no
+x509_extensions         = x509_extensions           # User should override default extensions at the command line
+
+[ req_distinguished_name ]
+countryName             = "US"
+stateOrProvinceName     = "California"
+localityName            = "Monterey"
+organizationName        = "CyberData Corporation"
+organizationalUnitName  = "CyberData Certificate Authority"
+commonName              = "CyberData Intermediate CA"
+
+
+### openssl ca configuration
+[ ca ]
+default_ca              = CA_default
+
+[ CA_default ]
+dir                     = ./intermediate_ca
+new_certs_dir           = $(dir)/new_certs
+database                = $(dir)/index.tx
+serial                  = $(dir)/serial.txt
+private_key             = $(dir)/intermediate.key.pem
+certificate             = $(dir)/intermediate.cert.pem
+default_md              = sha256
+name_opt                = ca_default
+cert_opt                = ca_default
+default_days            = 1000
+preserve                = no
+policy                  = policy_loose
+
+[ policy_loose ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+
+### x509 extensions
+[ x509_extensions ]
+
+[ client_cert ]
+basicConstraints        = CA:FALSE
+nsCertType              = client, email
+nsComment               = "OpenSSL Generated Client Certificate"
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid,issuer
+keyUsage                = critical, nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage        = clientAuth, emailProtection
+
+[ server_cert ]
+basicConstraints        = CA:FALSE
+nsCertType              = server
+nsComment               = "OpenSSL Generated Server Certificate"
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid,issuer:always
+keyUsage                = critical, digitalSignature, keyEncipherment
+extendedKeyUsage        = serverAuth
