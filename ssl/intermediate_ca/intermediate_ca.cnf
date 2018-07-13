@@ -47,6 +47,8 @@ emailAddress            = optional
 
 
 ### x509 extensions
+# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+#TODO can add policies here
 [ x509_extensions ]
 
 [ client_cert ]

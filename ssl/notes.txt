@@ -54,6 +54,12 @@ $ openssl genrsa \
     4096
 intermediate_ca
 
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in intermediate_ca/intermediate_ca.key.pem
+
 # Generate certificate signing request (CSR) for intermediate CA
 $ vim intermediate_ca/intermediate_ca.cnf
 $ openssl req \
@@ -134,7 +140,7 @@ $ openssl req \
     -key intermediate_ca/localhost_server.key.pem \
     -out intermediate_ca/localhost_server.csr.pem
 
-# Verify csr
+# Verify CSR
 $ openssl req \
     -verify \
     -text \
@@ -176,14 +182,28 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/localhost_client.key.pem \
     2048
-localhost
+localhost_client
 
-# Generate server csr
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in intermediate_ca/localhost_client.key.pem
+
+# Generate server CSR
+$ vim intermediate_ca/localhost_client.cnf
 $ openssl req \
     -new \
     -config intermediate_ca/localhost_client.cnf \
     -key intermediate_ca/localhost_client.key.pem \
     -out intermediate_ca/localhost_client.csr.pem
+
+# Verify CSR
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/localhost_client.csr.pem
 
 # Sign server CSR with intermediate CA
 # The intermediate CA is doing the signing, so use its config file
@@ -193,21 +213,21 @@ $ openssl ca \
     -config intermediate_ca/intermediate_ca.cnf \
     -extensions client_cert \
     -in intermediate_ca/localhost_client.csr.pem \
-    -out intermediate_ca/localhost_client.cert.pem
+    -out intermediate_ca/localhost_client.crt.pem
 
 # Verify cert
 $ openssl x509 \
     -noout \
     -text \
-    -in intermediate_ca/localhost_client.cert.pem
+    -in intermediate_ca/localhost_client.crt.pem
 
 # Verify cert chain
 $ openssl verify \
-    -CAfile intermediate_ca/intermediate.cert.pem \
-    intermediate_ca/localhost_client.cert.pem
+    -CAfile intermediate_ca/intermediate_ca.crt.pem \
+    intermediate_ca/localhost_client.crt.pem
 Should fail!
 
 $ openssl verify \
-    -CAfile intermediate_ca/ca-chain.cert.pem \
-    intermediate_ca/localhost_client.cert.pem
+    -CAfile intermediate_ca/ca-chain.crt.pem \
+    intermediate_ca/localhost_client.crt.pem
 Success
