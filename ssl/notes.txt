@@ -113,6 +113,7 @@ $ openssl req \
 $ openssl ca \
     -notext \
     -config intermediate_ca/intermediate_ca.cnf \
+    -extensions server_cert \
     -in intermediate_ca/localhost.csr.pem \
     -out intermediate_ca/localhost.cert.pem
 
