@@ -29,6 +29,12 @@ $ openssl req \
     -key root_ca/ca.key.pem \
     -out root_ca/ca.cert.pem
 
+# Verify cert
+$ openssl x509 \
+    -noout \
+    -text \
+    -in root_ca/ca.cert.pem
+
 
 ### Intermediate CA
 $ mkdir intermediate_ca
@@ -63,6 +69,22 @@ $ openssl ca \
     -notext \
     -in intermediate_ca/intermediate.csr.pem \
     -out intermediate_ca/intermediate.cert.pem
+
+# Verify cert
+$ openssl x509 \
+    -noout \
+    -text \
+    -in intermediate_ca/intermediate.cert.pem
+
+# Verify chain
+$ openssl verify \
+    -CAfile root_ca/ca.cert.pem \
+    intermediate_ca/intermediate.cert.pem
+
+# Create intermediate cert chain
+$ cat intermediate_ca/intermediate.cert.pem root_ca/ca.cert.pem > intermediate_ca/ca-chain.cert.pem
+
+###
 
 
 $ touch intermediate_ca/index.txt
