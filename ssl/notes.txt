@@ -101,7 +101,7 @@ $ openssl verify \
     intermediate_ca/intermediate_ca.crt.pem
 
 # Create intermediate cert chain
-$ cat intermediate_ca/intermediate_ca.crt.pem root_ca/root_ca.crt.pem > intermediate_ca/ca-chain.cert.pem
+$ cat intermediate_ca/intermediate_ca.crt.pem root_ca/root_ca.crt.pem > intermediate_ca/ca-chain.crt.pem
 
 
 # Prepare intermediate cert for signing other CSR's
@@ -155,17 +155,17 @@ $ openssl ca \
 $ openssl x509 \
     -noout \
     -text \
-    -in intermediate_ca/localhost_server.cert.pem
+    -in intermediate_ca/localhost_server.crt.pem
 
 # Verify cert chain
 $ openssl verify \
-    -CAfile intermediate_ca/intermediate.cert.pem \
-    intermediate_ca/localhost_server.cert.pem
+    -CAfile intermediate_ca/intermediate_ca.crt.pem \
+    intermediate_ca/localhost_server.crt.pem
 Should fail!
 
 $ openssl verify \
-    -CAfile intermediate_ca/ca-chain.cert.pem \
-    intermediate_ca/localhost_server.cert.pem
+    -CAfile intermediate_ca/ca-chain.crt.pem \
+    intermediate_ca/localhost_server.crt.pem
 Success
 
 
