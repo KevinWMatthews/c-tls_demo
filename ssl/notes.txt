@@ -149,7 +149,7 @@ $ openssl ca \
     -config intermediate_ca/intermediate_ca.cnf \
     -extensions server_cert \
     -in intermediate_ca/localhost_server.csr.pem \
-    -out intermediate_ca/localhost_server.cert.pem
+    -out intermediate_ca/localhost_server.crt.pem
 
 # Verify cert
 $ openssl x509 \

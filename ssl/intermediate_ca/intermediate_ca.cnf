@@ -25,10 +25,10 @@ default_ca              = CA_default
 [ CA_default ]
 dir                     = ./intermediate_ca
 new_certs_dir           = $(dir)/new_certs
-database                = $(dir)/index.tx
+database                = $(dir)/index.txt
 serial                  = $(dir)/serial.txt
-private_key             = $(dir)/intermediate.key.pem
-certificate             = $(dir)/intermediate.cert.pem
+private_key             = $(dir)/intermediate_ca.key.pem
+certificate             = $(dir)/intermediate_ca.crt.pem
 default_md              = sha256
 name_opt                = ca_default
 cert_opt                = ca_default
