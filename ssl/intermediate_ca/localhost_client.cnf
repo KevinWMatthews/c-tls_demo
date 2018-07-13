@@ -17,7 +17,7 @@ countryName             = "US"                                  # C
 stateOrProvinceName     = "California"                          # ST
 localityName            = "Monterey"                            # L
 organizationName        = "CyberData Corporation"               # O
-organizationalUnitName  = "CyberData Device"                    # ON
+organizationalUnitName  = "CyberData Client"                    # ON
 commonName              = "localhost"                           # CN
 # emailAddress =
 # name
