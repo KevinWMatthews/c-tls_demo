@@ -48,7 +48,9 @@ $ openssl req \
       -out intermediate_ca/intermediate.csr.pem
 
 $ touch root_ca/index.txt
+$ touch root_ca/index.txt.attr
 $ echo '00' > root_ca/serial.txt
+$ mkdir root_ca/new_certs
 
 # Sign intermediate CA with root CA
 # Specify the config file of the root CA - it is the one doing the signing so its function/operations must be configured
