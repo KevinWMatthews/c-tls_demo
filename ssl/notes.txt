@@ -3,7 +3,7 @@ $ vim root_ca/root_ca.cnf
 
 
 # Create key for root CA
-# Can be generated with the root CA cert
+# Can be generated with the root CA cert - I think I'd rather do this?
 $ openssl genrsa \
     -aes256 \
     -out root_ca/ca.key.pem \
@@ -19,6 +19,7 @@ $ openssl req \
     -new \
     -x509 \
     -config root_ca/root_ca.cnf \
+    -key root_ca/ca.key.pem \
     -out root_ca/ca.cert.pem
 
 

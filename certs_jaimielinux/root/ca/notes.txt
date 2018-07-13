@@ -1,4 +1,7 @@
-$ openssl genrsa -aes256 -out private/ca.key.pem 4096
+$ openssl genrsa \
+    -aes256 \
+    -out private/ca.key.pem \
+    4096
 password: password
 $ chmod 400 private/ca.key.pem
 $ openssl req -config openssl.cnf \
