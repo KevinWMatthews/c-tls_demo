@@ -125,12 +125,7 @@ $ openssl rsa \
     -noout \
     -in intermediate_ca/localhost_server.key.pem
 
-# Verify csr
-$ openssl req \
-    -verify \
-    -text \
-    -noout \
-    -in intermediate_ca/localhost_server.csr.pem
+$ vim intermediate_ca/localhost_server.cnf
 
 # Generate server csr
 $ openssl req \
@@ -138,6 +133,13 @@ $ openssl req \
     -config intermediate_ca/localhost_server.cnf \
     -key intermediate_ca/localhost_server.key.pem \
     -out intermediate_ca/localhost_server.csr.pem
+
+# Verify csr
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/localhost_server.csr.pem
 
 # Sign server CSR with intermediate CA
 # The intermediate CA is doing the signing, so use its config file
