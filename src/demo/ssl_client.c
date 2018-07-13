@@ -157,7 +157,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define CA_LIST         "../tls_demo/certs/intermediate/ca_chain_cert.pem"
 // #define CA_LIST         "../tls_demo/keys/intermediate_ca.crt"
 // #define CA_LIST         "../tls_demo/ca_chain.crt"
-#define CA_LIST         "../tls_demo/keys/ca.crt"
+#define CA_LIST         "../tls_demo/ssl/intermediate_ca/ca-chain.cert.pem"
 
 // #define CLIENT_CERT     "../tls_demo/keys/client_ip.crt"
 // #define CLIENT_KEY      "../tls_demo/keys/client_ip.key"
