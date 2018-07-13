@@ -103,6 +103,6 @@ localhost
 # Generate server csr
 $ openssl req \
     -new \
-    -config intermediate_ca/intermediate_ca.cnf \
+    -config intermediate_ca/localhost.cnf \
     -key intermediate_ca/localhost.key.pem \
     -out intermediate_ca/localhost.csr.pem

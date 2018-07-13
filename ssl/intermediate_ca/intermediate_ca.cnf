@@ -4,7 +4,7 @@
 # See `man req` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 [ req ]
 dir                 = intermediate_ca
-default_keyfile     = $dir/ca.key.pem           # Name of generated private key. Overridden by -keyout
+# default_keyfile     = $dir/ca.key.pem           # Name of generated private key. Overridden by -keyout
 default_bits        = 4096                      # If used with -new, specify number of bits in key. Override with -newkey
 distinguished_name  = req_distinguished_name    # Specify config file section for Distinguished Name.
 string_mask         = utf8only                  # Permit only these characters
