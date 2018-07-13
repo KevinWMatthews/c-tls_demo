@@ -1,0 +1,96 @@
+# OpenSSL configuration file for root CA.
+
+# Configuration for `openssl req`
+# See `man req` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+[ req ]
+distinguished_name  = req_distinguished_name    # Specify config file section for Distinguished Name.
+string_mask         = utf8only                  # Permit only these characters
+default_md          = sha256                    # Override with -[digest]
+prompt = no                                     # Read config file for Distinguished Name. Do not prompt user.
+x509_extensions     = x509_extensions           # Extensions for when -x509 is used. Overriden by -extensions
+
+[ req_distinguished_name ]
+# If prompt = no, specify values for Distinguished Name
+countryName             = "US"                                  # C
+stateOrProvinceName     = "California"                          # ST
+localityName            = "Monterey"                            # L
+organizationName        = "CyberData Corporation"               # O
+organizationalUnitName  = "CyberData Certificate Authority"     # ON
+commonName              = "CyberData Root CA"                   # CN
+# emailAddress =
+# name
+# surname
+# givenName
+# initials ?
+# dnQualifier
+
+# If prompt = yes, you may override the prompts for Distinguished Name
+# countryName             = "Enter a two-letter Country Name"
+# countryName_min         = 2
+# # countryName_max is always 2
+# stateOrProvinceName     = "Enter a full US State name"
+# stateOrProvinceName_min = 2                         # Weird, you can still leave it blank
+# localityName            = "Enter a city name"
+# organizationName        = "Enter your company name (min 1, max 42)"
+# organizationName_min    = 1
+# organizationName_max    = 42
+
+# Default x509 extensions
+[ x509_extensions ]
+# Nothing - forcing the user to specify what they are signing
+
+# x509 extensions for a typical root CA
+# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+[ v3_root_ca ]
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always,issuer
+# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
+basicConstraints        = critical, CA:true
+# Specify allowed operations for the private key
+keyUsage                = critical, digitalSignature, keyCertSign
+# Specify allowed operations for the certificate public key
+# extendedKeyUsage        =
+
+# x509 extensions for a typical intermediate CA
+# See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
+[ v3_intermediate_ca ]
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always,issuer
+# Specify is this is a CA and optionally how many CA's can be below this cert in the chain.
+basicConstraints        = critical, CA:true, pathlen:0
+# Specify allowed operations for the private key
+keyUsage                = critical, digitalSignature, keyCertSign
+# Specify allowed operations for the certificate public key
+# extendedKeyUsage        =
+
+
+# Configuration for `openssl ca`, which is used sign Certificate Signing Requests, which generates a certificate
+# Not needed to self-sign its own certificate but is needed to sign the CSR of an intermediate CA.
+# See `man ca`
+[ ca ]
+default_ca = CA_default
+# x509_extensions     = v3_intermediate_ca      # I think??
+
+[ CA_default ]
+dir                 = ./root_ca                 # Convenience variable
+new_certs_dir       = $(dir)/new_certs          # Directory for new certificates. Overridden by -outdir. Mandatory.
+database            = $(dir)/index.txt
+serial              = $(dir)/serial.txt
+private_key         = $(dir)/root_ca.key.pem        # Private key of signing CA. Overridden by -keyfile. Mandatory.
+certificate         = $(dir)/root_ca.cert.pem       # Certificate of signing CA. Overridden by -cert. Mandatory.
+default_md          = sha256
+name_opt            = ca_default                    # Recommended
+cert_opt            = ca_default
+default_days        = 1000
+preserve            = no
+policy              = policy_strict
+
+[ policy_strict ]
+# The root CA should only sign intermediate certificates that match.
+# See the POLICY FORMAT section of `man ca`.
+countryName             = match
+stateOrProvinceName     = match
+organizationName        = match
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional

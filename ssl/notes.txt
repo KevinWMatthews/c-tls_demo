@@ -12,9 +12,15 @@ $ vim root_ca/root_ca.cnf
 # Can be generated with the root CA cert - I think I'd rather do this?
 $ openssl genrsa \
     -aes256 \
-    -out root_ca/ca.key.pem \
+    -out root_ca/root_ca.key.pem \
     4096
-password
+root_ca
+
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in root_ca/root_ca.key.pem
 
 # Create cert for root CA
 # Prints to stdout by default, so specify -out
