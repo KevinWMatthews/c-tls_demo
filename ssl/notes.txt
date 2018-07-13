@@ -90,3 +90,12 @@ $ touch intermediate_ca/index.txt
 $ touch intermediate_ca/index.txt.attr
 $ echo '00' > intermediate_ca/serial.txt
 $ vim intermediate_ca/intermediate_ca.cnf
+
+
+### Generate server cert
+# Generate private key
+$ openssl genrsa \
+    -aes256 \
+    -out intermediate_ca/localhost.key.pem \
+    2048
+password
