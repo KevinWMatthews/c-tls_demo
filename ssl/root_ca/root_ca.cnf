@@ -46,15 +46,14 @@ commonName              = "CyberData Root CA"                   # CN
 # See `man ca`
 [ ca ]
 default_ca = CA_default
-# x509_extensions     = v3_intermediate_ca      # I think??
 
 [ CA_default ]
-dir                 = ./root_ca                 # Convenience variable
-new_certs_dir       = $(dir)/new_certs          # Directory for new certificates. Overridden by -outdir. Mandatory.
+dir                 = ./root_ca                     # Convenience variable
+new_certs_dir       = $(dir)/new_certs              # Directory for new certificates. Overridden by -outdir. Mandatory.
 database            = $(dir)/index.txt
 serial              = $(dir)/serial.txt
 private_key         = $(dir)/root_ca.key.pem        # Private key of signing CA. Overridden by -keyfile. Mandatory.
-certificate         = $(dir)/root_ca.cert.pem       # Certificate of signing CA. Overridden by -cert. Mandatory.
+certificate         = $(dir)/root_ca.crt.pem        # Certificate of signing CA. Overridden by -cert. Mandatory.
 default_md          = sha256
 name_opt            = ca_default                    # Recommended
 cert_opt            = ca_default
@@ -78,7 +77,7 @@ emailAddress            = optional
 #########
 # Default x509 extensions
 [ x509_extensions ]
-# Nothing - forcing the user to specify what they are signing
+# Nothing - force the user to specify what they are signing
 
 # x509 extensions for a typical root CA
 # See `man x509v3_config` or https://www.openssl.org/docs/manmaster/man5/x509v3_config.html

@@ -86,19 +86,19 @@ $ openssl ca \
     -config root_ca/root_ca.cnf \
     -extensions v3_intermediate_ca \
     -notext \
-    -in intermediate_ca/intermediate.csr.pem \
-    -out intermediate_ca/intermediate.cert.pem
+    -in intermediate_ca/intermediate_ca.csr.pem \
+    -out intermediate_ca/intermediate_ca.crt.pem
 
 # Verify cert
 $ openssl x509 \
     -noout \
     -text \
-    -in intermediate_ca/intermediate.cert.pem
+    -in intermediate_ca/intermediate_ca.crt.pem
 
 # Verify chain
 $ openssl verify \
-    -CAfile root_ca/ca.cert.pem \
-    intermediate_ca/intermediate.cert.pem
+    -CAfile root_ca/root_ca.crt.pem \
+    intermediate_ca/intermediate_ca.crt.pem
 
 # Create intermediate cert chain
 $ cat intermediate_ca/intermediate.cert.pem root_ca/ca.cert.pem > intermediate_ca/ca-chain.cert.pem
