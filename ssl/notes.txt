@@ -40,13 +40,29 @@ $ openssl genrsa \
     4096
 password
 
-$ touch intermediate_ca/index.txt
-$ echo '00' > intermediate_ca/serial.txt
-$ vim intermediate_ca/intermediate_ca.cnf
-
 # Generate certificate signing request (CSR) for intermediate CA
 $ openssl req \
     -new \
     -config intermediate_ca/intermediate_ca.cnf \
       -key intermediate_ca/intermediate.key.pem \
       -out intermediate_ca/intermediate.csr.pem
+
+$ touch root_ca/index.txt
+$ echo '00' > root_ca/serial.txt
+
+# Sign intermediate CA with root CA
+# Specify the config file of the root CA - it is the one doing the signing so its function/operations must be configured
+# Specify what kind of cert to create using -extensions
+# OpenSSL ca will by default output the cert in text and pem form.
+# Output only pem for using -notext
+$ openssl ca \
+    -config root_ca/root_ca.cnf \
+    -extensions v3_intermediate_ca \
+    -notext \
+    -in intermediate_ca/intermediate.csr.pem \
+    -out intermediate_ca/intermediate.cert.pem
+
+
+$ touch intermediate_ca/index.txt
+$ echo '00' > intermediate_ca/serial.txt
+$ vim intermediate_ca/intermediate_ca.cnf
