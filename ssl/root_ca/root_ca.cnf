@@ -73,6 +73,7 @@ keyUsage                = critical, digitalSignature, keyCertSign
 # See `man ca`
 [ ca ]
 default_ca = CA_default
+# x509_extensions     = v3_intermediate_ca      # I think??
 
 [ CA_default ]
 dir                 = ./root_ca             # Convenience variable

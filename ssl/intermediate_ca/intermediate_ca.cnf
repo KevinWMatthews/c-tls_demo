@@ -51,3 +51,61 @@ basicConstraints        = critical, CA:true
 keyUsage                = critical, digitalSignature, keyCertSign
 # Specify allowed operations for the certificate public key
 # extendedKeyUsage        =
+
+# Configuration for `openssl ca`, which is used sign Certificate Signing Requests, which generates a certificate
+# Not needed to self-sign its own certificate but is needed to sign the CSR of an intermediate CA.
+# See `man ca`
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir                 = ./root_ca             # Convenience variable
+# certs               = certs                 # Not sure if/what this does
+new_certs_dir       = $(dir)/new_certs             # Directory for new certificates. Overridden by -outdir. Mandatory.
+database            = $(dir)/index.txt
+serial              = $(dir)/serial.txt
+private_key         = $(dir)/ca.key.pem    # Private key of signing CA. Overridden by -keyfile. Mandatory.
+certificate         = $(dir)/ca.cert.pem   # Certificate of signing CA. Overridden by -cert. Mandatory.
+default_md          = sha256
+name_opt            = ca_default            # Recommended
+cert_opt            = ca_default
+default_days        = 1000
+preserve            = no
+policy              = policy_strict
+
+[ policy_loose ]
+# Allow the intermediate CA to sign a more diverse range of certificates.
+# See the POLICY FORMAT section of the `ca` man page.
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+### x509 extensions
+# For `openssl ca` or `openssl req`, select using -extensions option or config file section x509_extensions
+
+# Default x509 extensions for `openssl ca`
+[ x509_extensions ]
+
+# Extensions for client certificates (`man x509v3_config`).
+[ client_cert ]
+basicConstraints        = CA:FALSE
+nsCertType              = client, email
+nsComment               = "OpenSSL Generated Client Certificate"
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid,issuer
+keyUsage                = critical, nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage        = clientAuth, emailProtection
+
+# Extensions for server certificates (`man x509v3_config`).
+[ server_cert ]
+basicConstraints        = CA:FALSE
+nsCertType              = server
+nsComment               = "OpenSSL Generated Server Certificate"
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid,issuer:always
+keyUsage                = critical, digitalSignature, keyEncipherment
+extendedKeyUsage        = serverAuth
