@@ -158,6 +158,8 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define CA_LIST         "../tls_demo/keys/intermediate_ca.crt"
 // #define CA_LIST         "../tls_demo/ca_chain.crt"
 #define CA_LIST         "../tls_demo/ssl/intermediate_ca/ca-chain.cert.pem"
+#define CLIENT_CERT     "../tls_demo/ssl/intermediate_ca/localhost_client.cert.pem"
+#define CLIENT_KEY      "../tls_demo/ssl/intermediate_ca/localhost_client.key.pem"
 
 // #define CLIENT_CERT     "../tls_demo/keys/client_ip.crt"
 // #define CLIENT_KEY      "../tls_demo/keys/client_ip.key"
@@ -192,11 +194,11 @@ int main(void)
     }
 
     // Load certificate and key for when server does client-side authentication
-    // if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
-    // {
-        // destroy_ssl_context(ctx);
-        // exit(EXIT_FAILURE);
-    // }
+    if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
