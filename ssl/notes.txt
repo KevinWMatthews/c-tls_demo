@@ -28,10 +28,12 @@ $ openssl rsa \
 # -new generates a new request
 # -batch for non-interactive
 # Input key and output cert can not be specified in the config file?
+# Note the extensions!
 $ openssl req \
     -new \
     -x509 \
     -config root_ca/root_ca.cnf \
+    -extensions v3_root_ca \
     -key root_ca/root_ca.key.pem \
     -out root_ca/root_ca.crt.pem
 
