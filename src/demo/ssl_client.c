@@ -73,11 +73,13 @@ static int connect_to_socket(struct addrinfo *addr_list)
         ret = connect(socket_fd, addr->ai_addr, addr->ai_addrlen);
         if (ret == 0)
             break;      // success
+        else if (ret < 0)
+            perror("Could not connect to socket");
     }
 
     if (addr == NULL)
     {
-        fprintf(stderr, "Could not connect to socket\n");
+        close(socket_fd);
         return SOCKETFD_INVALID;
     }
     return socket_fd;
