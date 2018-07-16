@@ -231,3 +231,121 @@ $ openssl verify \
     -CAfile intermediate_ca/ca-chain.crt.pem \
     intermediate_ca/localhost_client.crt.pem
 Success
+
+
+
+
+### Generate server cert
+# Generate private key
+$ openssl genrsa \
+    -aes256 \
+    -out intermediate_ca/ip_server.key.pem \
+    2048
+ip_server
+
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in intermediate_ca/ip_server.key.pem
+
+$ vim intermediate_ca/ip_server.cnf
+
+# Generate server csr
+$ openssl req \
+    -new \
+    -config intermediate_ca/ip_server.cnf \
+    -key intermediate_ca/ip_server.key.pem \
+    -out intermediate_ca/ip_server.csr.pem
+
+# Verify CSR
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/ip_server.csr.pem
+
+# Sign server CSR with intermediate CA
+# The intermediate CA is doing the signing, so use its config file
+# Note the extensions!
+$ openssl ca \
+    -notext \
+    -config intermediate_ca/intermediate_ca.cnf \
+    -extensions server_cert \
+    -in intermediate_ca/ip_server.csr.pem \
+    -out intermediate_ca/ip_server.crt.pem
+
+# Verify cert
+$ openssl x509 \
+    -noout \
+    -text \
+    -in intermediate_ca/ip_server.crt.pem
+
+# Verify cert chain
+$ openssl verify \
+    -CAfile intermediate_ca/intermediate_ca.crt.pem \
+    intermediate_ca/ip_server.crt.pem
+Should fail!
+
+$ openssl verify \
+    -CAfile intermediate_ca/ca-chain.crt.pem \
+    intermediate_ca/ip_server.crt.pem
+Success
+
+
+
+### Generate client cert
+# Generate private key
+$ openssl genrsa \
+    -aes256 \
+    -out intermediate_ca/ip_client.key.pem \
+    2048
+ip_client
+
+# Check key
+$ openssl rsa \
+    -check \
+    -noout \
+    -in intermediate_ca/ip_client.key.pem
+
+# Generate server CSR
+$ vim intermediate_ca/ip_client.cnf
+$ openssl req \
+    -new \
+    -config intermediate_ca/ip_client.cnf \
+    -key intermediate_ca/ip_client.key.pem \
+    -out intermediate_ca/ip_client.csr.pem
+
+# Verify CSR
+$ openssl req \
+    -verify \
+    -text \
+    -noout \
+    -in intermediate_ca/ip_client.csr.pem
+
+# Sign server CSR with intermediate CA
+# The intermediate CA is doing the signing, so use its config file
+# Note the extensions!
+$ openssl ca \
+    -notext \
+    -config intermediate_ca/intermediate_ca.cnf \
+    -extensions client_cert \
+    -in intermediate_ca/ip_client.csr.pem \
+    -out intermediate_ca/ip_client.crt.pem
+
+# Verify cert
+$ openssl x509 \
+    -noout \
+    -text \
+    -in intermediate_ca/ip_client.crt.pem
+
+# Verify cert chain
+$ openssl verify \
+    -CAfile intermediate_ca/intermediate_ca.crt.pem \
+    intermediate_ca/ip_client.crt.pem
+Should fail!
+
+$ openssl verify \
+    -CAfile intermediate_ca/ca-chain.crt.pem \
+    intermediate_ca/ip_client.crt.pem
+Success
