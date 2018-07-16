@@ -165,7 +165,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define SERVER_LISTEN_PORT      8484
 #define DHFILE          "../tls_demo/keys/dh1024.pem"
 // #define CA_LIST         "../tls_demo/keys/ca.crt"
-#define CA_LIST           "../tls_demo/ssl/intermediate_ca/ca-chain.crt.pem"
+#define CA_LIST           "../tls_demo/ssl2/intermediate_ca/ca-chain.crt.pem"
 
 // #define SERVER_CERT     "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
 // #define SERVER_KEY      "../tls_demo/certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
