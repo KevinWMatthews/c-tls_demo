@@ -165,7 +165,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define SERVER_LISTEN_PORT      8484
 #define DHFILE          "../tls_demo/keys/dh1024.pem"
 // #define CA_LIST         "../tls_demo/keys/ca.crt"
-#define CA_LIST           "../tls_demo/ssl/intermediate_ca/ca-chain.cert.pem"
+#define CA_LIST           "../tls_demo/ssl/intermediate_ca/ca-chain.crt.pem"
 
 // #define SERVER_CERT     "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
 // #define SERVER_KEY      "../tls_demo/certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
@@ -177,7 +177,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define SERVER_KEY      "../tls_demo/keys/intermediate_ca.key"
 // #define SERVER_CERT     "../tls_demo/keys/server_intermediate_localhost.crt"
 // #define SERVER_KEY      "../tls_demo/keys/server_intermediate_localhost.key"
-#define SERVER_CERT     "../tls_demo/ssl/intermediate_ca/localhost_server.cert.pem"
+#define SERVER_CERT     "../tls_demo/ssl/intermediate_ca/localhost_server.crt.pem"
 #define SERVER_KEY      "../tls_demo/ssl/intermediate_ca/localhost_server.key.pem"
 // #define SERVER_CERT     "../tls_demo/keys/server_ip.crt"
 // #define SERVER_KEY      "../tls_demo/keys/server_ip.key"
