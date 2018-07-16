@@ -159,9 +159,9 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define CA_LIST         "../tls_demo/certs/intermediate/ca_chain_cert.pem"
 // #define CA_LIST         "../tls_demo/keys/intermediate_ca.crt"
 // #define CA_LIST         "../tls_demo/ca_chain.crt"
-#define CA_LIST         "../tls_demo/ssl/intermediate_ca/ca-chain.crt.pem"
-#define CLIENT_CERT     "../tls_demo/ssl2/intermediate_ca/localhost_client.crt.pem"
-#define CLIENT_KEY      "../tls_demo/ssl2/intermediate_ca/localhost_client.key.pem"
+// #define CA_LIST         "../tls_demo/ssl2/intermediate_ca/ca-chain.crt.pem"
+// #define CLIENT_CERT     "../tls_demo/ssl/intermediate_ca/localhost_client.crt.pem"
+// #define CLIENT_KEY      "../tls_demo/ssl/intermediate_ca/localhost_client.key.pem"
 
 // #define CLIENT_CERT     "../tls_demo/keys/client_ip.crt"
 // #define CLIENT_KEY      "../tls_demo/keys/client_ip.key"
@@ -175,7 +175,8 @@ int main(void)
 
     initialize_ssl_library();
 
-    ctx = initialize_ssl_context(SSL_VERIFY_PEER, verify_callback);
+    // ctx = initialize_ssl_context(SSL_VERIFY_PEER, verify_callback);
+    ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -189,18 +190,18 @@ int main(void)
 
 
     // Load CA list for doing server-side authentication
-    if ( load_ca_list(ctx, CA_LIST) < 0 )
-    {
-        destroy_ssl_context(ctx);
-        exit(EXIT_FAILURE);
-    }
+    // if ( load_ca_list(ctx, CA_LIST) < 0 )
+    // {
+        // destroy_ssl_context(ctx);
+        // exit(EXIT_FAILURE);
+    // }
 
     // Load certificate and key for when server does client-side authentication
-    if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
-    {
-        destroy_ssl_context(ctx);
-        exit(EXIT_FAILURE);
-    }
+    // if ( load_certificate_and_key(ctx, CLIENT_CERT, CLIENT_KEY) < 0 )
+    // {
+        // destroy_ssl_context(ctx);
+        // exit(EXIT_FAILURE);
+    // }
 
     socket_fd = tcp_connect(HOST, PORT);
     if (socket_fd < 0)
