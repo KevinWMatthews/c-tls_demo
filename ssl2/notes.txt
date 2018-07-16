@@ -1,20 +1,17 @@
 # Generate root directory for all certs
-$ mkdir ssl
-$ cd ssl
+$ mkdir ssl2
+$ cd ssl2
 
 
 ### Root CA
 $ mkdir root_ca
-$ vim root_ca/root_ca.cnf
-
 
 # Create key for root CA
-# Can be generated with the root CA cert - I think I'd rather do this?
 $ openssl genrsa \
     -aes256 \
     -out root_ca/root_ca.key.pem \
     4096
-root_ca
+ROOT_CA
 
 # Check key
 $ openssl rsa \
@@ -23,12 +20,6 @@ $ openssl rsa \
     -in root_ca/root_ca.key.pem
 
 # Self-sign cert for root CA
-# Prints to stdout by default, so specify -out
-# -x509 generates a self-signed cert instead of a certificate signing request (-in is used to sign a csr)
-# -new generates a new request
-# -batch for non-interactive
-# Input key and output cert can not be specified in the config file?
-# Note the extensions!
 $ openssl req \
     -new \
     -x509 \
@@ -44,6 +35,7 @@ $ openssl x509 \
     -in root_ca/root_ca.crt.pem
 
 
+
 ### Intermediate CA
 $ mkdir intermediate_ca
 
@@ -52,7 +44,7 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/intermediate_ca.key.pem \
     4096
-intermediate_ca
+INTERMEDIATE_CA
 
 # Check key
 $ openssl rsa \
@@ -62,6 +54,7 @@ $ openssl rsa \
 
 # Generate certificate signing request (CSR) for intermediate CA
 $ vim intermediate_ca/intermediate_ca.cnf
+
 #TODO are the extensions needed? They seem to have no effect on the actual .pem file, so I think not.
     # -extensions v3_intermediate_ca \
 $ openssl req \
@@ -71,24 +64,18 @@ $ openssl req \
     -out intermediate_ca/intermediate_ca.csr.pem
 
 # Verify CSR
-# -noout    do not print csr hash
-# -text     print in human-readable form
 $ openssl req \
     -verify \
     -text \
     -noout \
     -in intermediate_ca/intermediate_ca.csr.pem
 
+# Sign intermediate CA with root CA
 $ touch root_ca/index.txt
 $ touch root_ca/index.txt.attr
 $ echo '00' > root_ca/serial.txt
 $ mkdir root_ca/new_certs
 
-# Sign intermediate CA with root CA
-# Specify the config file of the root CA - it is the one doing the signing so its function/operations must be configured
-# Specify what kind of cert to create using -extensions
-# OpenSSL ca will by default output the cert in text and pem form.
-# Output only pem for using -notext
 $ openssl ca \
     -config root_ca/root_ca.cnf \
     -extensions v3_intermediate_ca \
@@ -103,14 +90,12 @@ $ openssl x509 \
     -in intermediate_ca/intermediate_ca.crt.pem
 
 # Verify chain
-# Chain for the intermediate cert only contains the root CA so this works.
 $ openssl verify \
     -CAfile root_ca/root_ca.crt.pem \
     intermediate_ca/intermediate_ca.crt.pem
 
 # Create intermediate cert chain
 $ cat intermediate_ca/intermediate_ca.crt.pem root_ca/root_ca.crt.pem > intermediate_ca/ca-chain.crt.pem
-
 
 # Prepare intermediate cert for signing other CSR's
 $ touch intermediate_ca/index.txt
@@ -125,7 +110,7 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/localhost_server.key.pem \
     2048
-localhost_server
+LOCALHOST_SERVER
 
 # Check key
 $ openssl rsa \
@@ -134,7 +119,6 @@ $ openssl rsa \
     -in intermediate_ca/localhost_server.key.pem
 
 $ vim intermediate_ca/localhost_server.cnf
-
 # Generate server CSR
 $ openssl req \
     -new \
@@ -150,8 +134,6 @@ $ openssl req \
     -in intermediate_ca/localhost_server.csr.pem
 
 # Sign server CSR with intermediate CA
-# The intermediate CA is doing the signing, so use its config file
-# Note the extensions!
 $ openssl ca \
     -notext \
     -config intermediate_ca/intermediate_ca.cnf \
@@ -184,7 +166,6 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/localhost_client.key.pem \
     2048
-localhost_client
 
 # Check key
 $ openssl rsa \
@@ -208,8 +189,6 @@ $ openssl req \
     -in intermediate_ca/localhost_client.csr.pem
 
 # Sign server CSR with intermediate CA
-# The intermediate CA is doing the signing, so use its config file
-# Note the extensions!
 $ openssl ca \
     -notext \
     -config intermediate_ca/intermediate_ca.cnf \
@@ -236,14 +215,13 @@ Success
 
 
 
-
 ### Generate server cert
 # Generate private key
 $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/ip_server.key.pem \
     2048
-ip_server
+IP_SERVER
 
 # Check key
 $ openssl rsa \
@@ -268,8 +246,6 @@ $ openssl req \
     -in intermediate_ca/ip_server.csr.pem
 
 # Sign server CSR with intermediate CA
-# The intermediate CA is doing the signing, so use its config file
-# Note the extensions!
 $ openssl ca \
     -notext \
     -config intermediate_ca/intermediate_ca.cnf \
@@ -302,7 +278,7 @@ $ openssl genrsa \
     -aes256 \
     -out intermediate_ca/ip_client.key.pem \
     2048
-ip_client
+IP_CLIENT
 
 # Check key
 $ openssl rsa \
@@ -326,8 +302,6 @@ $ openssl req \
     -in intermediate_ca/ip_client.csr.pem
 
 # Sign server CSR with intermediate CA
-# The intermediate CA is doing the signing, so use its config file
-# Note the extensions!
 $ openssl ca \
     -notext \
     -config intermediate_ca/intermediate_ca.cnf \
