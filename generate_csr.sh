@@ -13,6 +13,7 @@ usage ()
     echo "  CONFIG          Configuration for openssl req for the new certificate"
     echo "  PRIVATE_KEY     Existing private key file for the new certificate/key pair"
     echo "  CSR             Name of resulting CSR"
+    echo "  --prefix        Optional path prefix for config, key, and csr. TODO Finish this!"
     echo ""
     echo "It is possible to create both a key and CSR with a single same call. For simplicity, this script does not allow this."
     echo "It is possible to create a CSR from an existing CSR. For simplicity, this script does not allow this."

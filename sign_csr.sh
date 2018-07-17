@@ -24,6 +24,8 @@ usage ()
     echo "Sign a Certificate Signing Request using a Certifate Authority's self-signed certificate"
     echo ""
     echo "TODO update this"
+    echo "Find extensions by examining config file"
+    echo ""
 }
 
 NUM_ARGS=4
