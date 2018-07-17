@@ -177,10 +177,12 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 // #define SERVER_KEY      "../tls_demo/keys/intermediate_ca.key"
 // #define SERVER_CERT     "../tls_demo/keys/server_intermediate_localhost.crt"
 // #define SERVER_KEY      "../tls_demo/keys/server_intermediate_localhost.key"
-#define SERVER_CERT     "../tls_demo/ssl/intermediate_ca/localhost_server.crt.pem"
-#define SERVER_KEY      "../tls_demo/ssl/intermediate_ca/localhost_server.key.pem"
+// #define SERVER_CERT     "../tls_demo/ssl/intermediate_ca/localhost_server.crt.pem"
+// #define SERVER_KEY      "../tls_demo/ssl/intermediate_ca/localhost_server.key.pem"
 // #define SERVER_CERT     "../tls_demo/keys/server_ip.crt"
 // #define SERVER_KEY      "../tls_demo/keys/server_ip.key"
+#define SERVER_CERT     "../tls_demo/ssl/intermediate_ca/tls_demo_dev_1_server.crt.pem"
+#define SERVER_KEY      "../tls_demo/ssl/intermediate_ca/tls_demo_dev_1_server.key.pem"
 
 int main(void)
 {
