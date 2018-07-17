@@ -351,3 +351,8 @@ $ openssl verify \
     -CAfile intermediate_ca/ca-chain.crt.pem \
     intermediate_ca/ip_client.crt.pem
 Success
+
+
+verify -no-CApath
+
+passwords: tls1 tls2
