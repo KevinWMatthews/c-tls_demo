@@ -165,7 +165,7 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 #define SERVER_LISTEN_PORT      8484
 #define DHFILE          "../tls_demo/keys/dh1024.pem"
 // #define CA_LIST         "../tls_demo/keys/ca.crt"
-// #define CA_LIST           "../tls_demo/ssl/intermediate_ca/ca-chain.crt.pem"
+#define CA_LIST           "../tls_demo/ssl2/intermediate_ca/ca-chain.crt.pem"
 
 // #define SERVER_CERT     "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/www.example.com.cert.pem"
 // #define SERVER_KEY      "../tls_demo/certs_jaimielinux/root/ca/intermediate/private/www.example.com.key.pem"
@@ -190,8 +190,8 @@ int main(void)
     int listen_socket = SOCKETFD_INVALID;
 
     initialize_ssl_library();
-    // ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
-    ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
+    ctx = initialize_ssl_context(SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);  // Request client certificate and fail if is not valid.
+    // ctx = initialize_ssl_context(SSL_VERIFY_NONE, NULL);       // Do not request client certificate
     if (ctx == NULL)
         exit(EXIT_FAILURE);
 
@@ -217,11 +217,11 @@ int main(void)
     }
 
     // Load CA list for doing client-side authentication
-    // if ( load_ca_list(ctx, CA_LIST) < 0 )
-    // {
-        // destroy_ssl_context(ctx);
-        // exit(EXIT_FAILURE);
-    // }
+    if ( load_ca_list(ctx, CA_LIST) < 0 )
+    {
+        destroy_ssl_context(ctx);
+        exit(EXIT_FAILURE);
+    }
 
     listen_socket = tcp_listen(SERVER_LISTEN_PORT);
     if (listen_socket < 0)
