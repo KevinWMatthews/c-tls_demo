@@ -23,7 +23,7 @@ usage ()
     echo ""
     echo "Sign a Certificate Signing Request using a Certifate Authority's self-signed certificate"
     echo ""
-    echo "Sign a CSR using the CA's private key. Read device's (not CA's) config, input a device's CSR, output a new CERT for the device."
+    echo "TODO update this"
 }
 
 NUM_ARGS=4
@@ -42,7 +42,7 @@ fi
 CA_CONFIG="$1"
 CA_EXTENSIONS="$2"
 CSR="$3"
-CERT="$4"
+CRT="$4"
 
 if [ -z $CA_CONFIG ]; then
     echo "$(basename $0): Invalid CA_CONFIG"
