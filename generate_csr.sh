@@ -5,11 +5,17 @@ usage ()
     echo ""
     echo "$(basename $0) [CONFIG] [PRIVATE_KEY] [CSR]"
     echo ""
-    echo "Generate Certificate Signing Request and Private Key"
+    echo "Generate Certificate Signing Request"
     echo ""
-    echo "This script creates a private key and a CSR."
-    echo "It is possible to create a CSR from an existing CSR."
-    echo "For simplicity, this script does not allow this."
+    echo "Create a CSR from a config file and private key."
+    echo ""
+    echo "Options:"
+    echo "  CONFIG          Configuration for openssl req for the new certificate"
+    echo "  PRIVATE_KEY     Existing private key file for the new certificate/key pair"
+    echo "  CSR             Name of resulting CSR"
+    echo ""
+    echo "It is possible to create both a key and CSR with a single same call. For simplicity, this script does not allow this."
+    echo "It is possible to create a CSR from an existing CSR. For simplicity, this script does not allow this."
 }
 
 if [ $# -lt 3 ]; then
@@ -45,5 +51,5 @@ fi
 openssl req \
     -new \
     -config $CONFIG \
-    -keyout $PRIVATE_KEY \
+    -key $PRIVATE_KEY \
     -out $CSR
