@@ -149,8 +149,9 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
     return preverify_ok;
 }
 
-#define HOST            "localhost"
+// #define HOST            "localhost"
 // #define HOST            "10.0.1.34"
+#define HOST            "tls_demo_dev_1"
 #define PORT            "8484"
 
 // #define CA_LIST         "../tls_demo/certs_jaimielinux/root/ca/intermediate/certs/ca-chain.cert.pem"

@@ -9,6 +9,7 @@ services:
       - type: bind
         source: ../build_docker_tls_demo
         target: /home/build_tls_demo
+
     # stdin_open: true      # Same as --interactive
 
     # Bash ignores SIGTERM, which Docker uses by default to terminate containers.
