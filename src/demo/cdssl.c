@@ -204,6 +204,21 @@ int cdssl_verify_common_name(SSL *ssl, const char *common_name, unsigned int fla
     //TODO implement for OpenSSL v1.0.2
     // https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_set1_host.html
 
+#if 0
+    // See https://wiki.openssl.org/index.php/Hostname_validation
+    // https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_set1_host.html
+
+    X509_VERIFY_PARAM *param = NULL;
+    param = SSL_get0_param(ssl);        // Do not free this pointer!
+
+    X509_VERIFY_PARAM_set_hostflags(param, flags);
+
+    if ( !X509_VERIFY_PARAM_set1_host(param, hostname, hostname_len) )
+    {
+        print_ssl_error("Error configuring common name check\n");
+        return -1;
+    }
+#endif
     return 0;
 }
 
